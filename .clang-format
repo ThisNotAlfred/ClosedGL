@@ -1,0 +1,39 @@
+Language: Cpp
+BasedOnStyle: LLVM
+IndentWidth: 4
+UseTab: Never
+AccessModifierOffset: 4
+ColumnLimit: 140
+LineEnding: LF
+AlignAfterOpenBracket: Align
+AlignArrayOfStructures: Right
+AlignEscapedNewlines: Right
+AlignOperands: Align
+AlignConsecutiveAssignments:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: true
+  AlignCompound: true
+  PadOperators: true
+AlignTrailingComments:
+  Kind: Always
+  OverEmptyLines: 2
+DerivePointerAlignment: false
+PointerAlignment: Left
+BreakBeforeBraces: Linux
+BreakStringLiterals: true
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
+AlwaysBreakAfterReturnType: TopLevelDefinitions
+IndentCaseLabels: true
+SpacesInLineCommentPrefix:
+  Minimum: 1
+  Maximum: -1
+SeparateDefinitionBlocks: Leave
+SpaceInEmptyBlock: false
+Cpp11BracedListStyle: false
+SpaceBeforeCpp11BracedList: true
+InsertNewlineAtEOF: false
+MaxEmptyLinesToKeep: 2

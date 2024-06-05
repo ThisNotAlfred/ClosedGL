@@ -1,0 +1,13 @@
+CompileFlags:
+    Compiler: clang++
+Diagnostics:
+  ClangTidy:
+    Add: [ modernize*, performance*, readability* ]
+    FastCheckFilter: Loose
+InlayHints:
+  BlockEnd: No
+  Designators: Yes
+  Enabled: Yes
+  ParameterNames: Yes
+  DeducedTypes: Yes
+  TypeNameLimit: 24
