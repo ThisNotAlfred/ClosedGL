@@ -1,5 +1,7 @@
 #include "closed_gl.hpp"
 
+#include <chrono>
+#include <format>
 #include <iostream>
 
 auto
@@ -38,6 +40,9 @@ main() -> int
 
     auto* window = glfwCreateWindow(1600, 900, "beaviewer", nullptr, nullptr);
     if (window == nullptr) {
+#ifdef _DEBUG
+        std::cerr << "failed to creat the window";
+#endif
         glfwTerminate();
         return -1;
     }
@@ -57,8 +62,18 @@ main() -> int
 
 
     while (glfwWindowShouldClose(window) == 0) {
+        // setting `loop_start` to calculate `elapsed_time` later
+        auto loop_start = std::chrono::steady_clock::now();
+
         glfwPollEvents();
         glfwSwapBuffers(window);
+
+        // setting `time_point` and calculating `elapsed_time`
+        auto loop_end     = std::chrono::steady_clock::now();
+        auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(loop_end - loop_start);
+
+        // setting window title to current loop's `elapsed_time`
+        glfwSetWindowTitle(window, std::format("frame time: {}", elapsed_time.count()).c_str());
     }
 
     gl::glDisableVertexAttribArray(0);
