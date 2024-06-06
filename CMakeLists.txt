@@ -21,9 +21,11 @@ target_sources(
     
     # sources
     "${ClosedGl_SOURCE_DIR}/main.cpp"
+    "${ClosedGl_SOURCE_DIR}/utils.cpp"
 
     # headers
     "${ClosedGl_INCLUDE_DIR}/closed_gl.hpp"
+    "${ClosedGl_INCLUDE_DIR}/utils.hpp"
 )
 
 target_include_directories(ClosedGl PRIVATE "${ClosedGl_INCLUDE_DIR}/")
@@ -131,7 +133,7 @@ add_library(
 )
 
 target_include_directories(
-    imgui PRIVATE 
+    imgui PUBLIC
     "${imgui_SOURCE_DIR}" 
     "${imgui_SOURCE_DIR}/backends"
     "${imgui_SOURCE_DIR}/misc/cpp"
