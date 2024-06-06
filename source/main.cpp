@@ -33,34 +33,6 @@ key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
     }
 }
 
-const auto vert_shader = R"(
-#version 460 core
-precision highp float;
-layout (location = 0) in vec3 a_position;
-
-layout (location = 0) uniform mat4 u_mat_proj;
-layout (location = 1) uniform mat4 u_mat_view;
-layout (location = 2) uniform mat4 u_mat_model;
-
-void
-main()
-{
-    gl_Position = u_mat_proj * u_mat_view * u_mat_model * vec4(a_position, 1.0);
-}
-)";
-
-const auto frag_shader = R"(
-#version 460 core
-precision highp float;
-layout (location = 0) out vec4 o_color;
-
-void
-main()
-{
-    o_color = vec4(1.0f, 1.0f, 0.0f, 1.0f);
-}
-)";
-
 auto
 main() -> int
 {
@@ -122,27 +94,14 @@ main() -> int
         std::println(stderr, "failed to load the mesh\n");
     }
 
-    auto compile_shader = [](const char* str, gl::GLenum type) {
-        auto shader = gl::glCreateShader(type);
-        gl::glShaderSource(shader, 1, &str, nullptr);
-        gl::glCompileShader(shader);
-        gl::GLint out = 0;
-        gl::glGetShaderiv(shader, gl::GL_COMPILE_STATUS, &out);
-        if (out == 1) {
-            return shader;
-        }
+    // here shaders from `shaders/`
 
-        gl::GLint length = 0;
-        gl::glGetShaderiv(shader, gl::GL_INFO_LOG_LENGTH, &length);
-        char* log = (char*)calloc(1, length);
-        gl::glGetShaderInfoLog(shader, length, nullptr, log);
-        std::println(stderr, "SHADER ERROR: {}", log);
-        assert(false);
-    };
+    auto vert_path = std::filesystem::path("shaders/vert.slang.spv");
+    auto frag_path = std::filesystem::path("shaders/frag.slang.spv");
+    auto vert      = compile_shader(vert_path, gl::GL_VERTEX_SHADER);
+    auto frag      = compile_shader(frag_path, gl::GL_FRAGMENT_SHADER);
+    auto program   = gl::glCreateProgram();
 
-    auto vert    = compile_shader(vert_shader, gl::GL_VERTEX_SHADER);
-    auto frag    = compile_shader(frag_shader, gl::GL_FRAGMENT_SHADER);
-    auto program = gl::glCreateProgram();
     gl::glAttachShader(program, vert);
     gl::glAttachShader(program, frag);
     gl::glLinkProgram(program);
@@ -153,7 +112,6 @@ main() -> int
     auto mat_proj  = glm::mat4(1);
     auto mat_view  = glm::mat4(1);
     auto mat_model = glm::mat4(1);
-
 
     glm::vec3 cam_pos   = glm::vec3(0.0F, 0.0F, 10.0F);
     glm::vec3 cam_front = glm::vec3(0.0F, 0.0F, -1.0F);
@@ -216,7 +174,7 @@ main() -> int
         dt                                = time.count();
 
 #ifdef _DEBUG
-        glfwSetWindowTitle(window, std::format("ClosedGL {}fps", (int)(1.0F / dt)).c_str());
+        glfwSetWindowTitle(window, std::format("ClosedGL {}fps", static_cast<int>(1.0F / dt)).c_str());
 #endif
     }
 
