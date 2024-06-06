@@ -81,6 +81,29 @@ main() -> int
 
     auto user_inter = UI(window);
 
+
+    float vertices[] = {
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        0.0f, 0.5f, 0.0f };
+    uint32_t indices[] = { 0, 1, 2 };
+
+    gl::GLuint vbo, vao, ibo;
+    gl::glCreateBuffers(1, &vbo);
+    gl::glNamedBufferStorage(vbo, sizeof(vertices), vertices, gl::GL_DYNAMIC_STORAGE_BIT);
+    
+    gl::glCreateBuffers(1, &ibo);
+    gl::glNamedBufferStorage(ibo, sizeof(indices), indices, gl::GL_DYNAMIC_STORAGE_BIT);
+
+    gl::glCreateVertexArrays(1, &vao);
+
+    gl::glVertexArrayVertexBuffer(vao, 0, vbo, 0, sizeof(float) * 3);
+    gl::glVertexArrayElementBuffer(vao, ibo);
+
+    gl::glEnableVertexArrayAttrib(vao, 0);
+    gl::glVertexArrayAttribFormat(vao, 0, 3, gl::GL_FLOAT, false, 0);
+    gl::glVertexArrayAttribBinding(vao, 0, 0);
+
     // main loop
     unsigned int elapsed_time = 0;
     while (glfwWindowShouldClose(window) == 0) {
@@ -92,6 +115,10 @@ main() -> int
         gl::glClear(gl::GL_COLOR_BUFFER_BIT);
 
         glfwPollEvents();
+        
+        gl::glBindVertexArray(vao);
+        gl::glBindBuffer(gl::GL_ELEMENT_ARRAY_BUFFER, ibo);
+        gl::glDrawElements(gl::GL_TRIANGLES, sizeof(indices) / sizeof(uint32_t), gl::GL_UNSIGNED_INT, nullptr);
 
         // start imgui frame
         ImGui_ImplOpenGL3_NewFrame();
