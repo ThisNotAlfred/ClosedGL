@@ -1,4 +1,9 @@
 #include "closed_gl.hpp"
+#include "glbinding/gl/enum.h"
+#include "glbinding/gl/functions.h"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 #include <chrono>
 #include <format>
@@ -52,6 +57,22 @@ main() -> int
 
     glfwMakeContextCurrent(window);
 
+    // setting up imgui
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+
+    auto imgui_io = ImGui::GetIO();
+    static_cast<void>(imgui_io);
+    // enabling keyboard in imgui
+    imgui_io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+    // dark style imgui
+    ImGui::StyleColorsDark();
+
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 460");
+
+    // initializing opengl
     glbinding::initialize(glfwGetProcAddress, false);
     glbinding::aux::enableGetErrorCallback();
 
@@ -60,20 +81,38 @@ main() -> int
               << "OpenGL Vendor:   " << glbinding::aux::ContextInfo::vendor() << '\n'
               << "OpenGL Renderer: " << glbinding::aux::ContextInfo::renderer() << '\n';
 
-
+    // main loop
+    unsigned int elapsed_time = 0;
     while (glfwWindowShouldClose(window) == 0) {
+
         // setting `loop_start` to calculate `elapsed_time` later
         auto loop_start = std::chrono::steady_clock::now();
 
         glfwPollEvents();
+
+        // start imgui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        // current frame time using imgui
+        ImGui::Text("%dms", elapsed_time);
+
+        // rendering imgui windows
+        ImGui::Render();
+        
+        // clearing last frame
+        gl::glClearColor(0, 0, 0, 0);
+        gl::glClear(gl::GL_COLOR_BUFFER_BIT);
+
+        // drawing imgui windows on current frame
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         glfwSwapBuffers(window);
 
         // setting `time_point` and calculating `elapsed_time`
-        auto loop_end     = std::chrono::steady_clock::now();
-        auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(loop_end - loop_start);
-
-        // setting window title to current loop's `elapsed_time`
-        glfwSetWindowTitle(window, std::format("frame time: {}", elapsed_time.count()).c_str());
+        auto loop_end = std::chrono::steady_clock::now();
+        elapsed_time  = std::chrono::duration_cast<std::chrono::milliseconds>(loop_end - loop_start).count();
     }
 
     gl::glDisableVertexAttribArray(0);
