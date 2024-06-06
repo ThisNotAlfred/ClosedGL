@@ -22,10 +22,12 @@ target_sources(
     # sources
     "${ClosedGl_SOURCE_DIR}/main.cpp"
     "${ClosedGl_SOURCE_DIR}/utils.cpp"
+    "${ClosedGl_SOURCE_DIR}/user_interface.cpp"
 
     # headers
     "${ClosedGl_INCLUDE_DIR}/closed_gl.hpp"
     "${ClosedGl_INCLUDE_DIR}/utils.hpp"
+    "${ClosedGl_INCLUDE_DIR}/user_interface.hpp"
 )
 
 target_include_directories(ClosedGl PRIVATE "${ClosedGl_INCLUDE_DIR}/")
