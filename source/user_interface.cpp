@@ -45,8 +45,8 @@ UI::top_menu() -> void
 auto
 UI::toolset() -> void
 {
-    if (this->show_toolset && ImGui::Begin("Toolbox")) {
-
+    if (this->show_toolset) {
+        ImGui::Begin("Toolbox");
 
         ImGui::End();
     }
