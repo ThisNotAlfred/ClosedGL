@@ -118,7 +118,7 @@ main() -> int
     auto path = std::filesystem::path("DragonAttenuation.glb");
     auto mesh = Mesh(path);
 
-    if (mesh.create_buffers()) {
+    if (!mesh.create_buffers()) {
         std::println(stderr, "failed to load the mesh\n");
     }
 
