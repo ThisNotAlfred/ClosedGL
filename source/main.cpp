@@ -1,5 +1,7 @@
 #include "closed_gl.hpp"
 
+#include "user_interface.hpp"
+
 #include <chrono>
 #include <format>
 #include <iostream>
@@ -38,7 +40,7 @@ main() -> int
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 
-    auto* window = glfwCreateWindow(1600, 900, "beaviewer", nullptr, nullptr);
+    auto* window = glfwCreateWindow(1600, 900, "ClosedGL", nullptr, nullptr);
     if (window == nullptr) {
 #ifdef _DEBUG
         std::cerr << "failed to creat the window";
@@ -58,6 +60,7 @@ main() -> int
 
     auto imgui_io = ImGui::GetIO();
     static_cast<void>(imgui_io);
+
     // enabling keyboard in imgui
     imgui_io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
@@ -76,6 +79,8 @@ main() -> int
               << "OpenGL Vendor:   " << glbinding::aux::ContextInfo::vendor() << '\n'
               << "OpenGL Renderer: " << glbinding::aux::ContextInfo::renderer() << '\n';
 
+    auto user_inter = UI(window);
+
     // main loop
     unsigned int elapsed_time = 0;
     while (glfwWindowShouldClose(window) == 0) {
@@ -93,8 +98,8 @@ main() -> int
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        
-        
+        // user interface drawing
+        user_inter.draw();
 
         // rendering imgui windows
         ImGui::Render();
@@ -105,12 +110,16 @@ main() -> int
         // setting `time_point` and calculating `elapsed_time`
         auto loop_end = std::chrono::steady_clock::now();
         elapsed_time  = std::chrono::duration_cast<std::chrono::milliseconds>(loop_end - loop_start).count();
+
+#ifdef _DEBUG
+        glfwSetWindowTitle(window, std::format("ClosedGL {}ms", elapsed_time).c_str());
+#endif
     }
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
 
     glfwTerminate();
-    
+
     return 0;
 }
