@@ -466,3 +466,6 @@ FodyWeavers.xsd
 # build directory
 build/
 CMakeSettings.json
+
+# windows config stuff
+*.ini
