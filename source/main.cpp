@@ -1,9 +1,4 @@
 #include "closed_gl.hpp"
-#include "glbinding/gl/enum.h"
-#include "glbinding/gl/functions.h"
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
 
 #include <chrono>
 #include <format>
@@ -84,9 +79,12 @@ main() -> int
     // main loop
     unsigned int elapsed_time = 0;
     while (glfwWindowShouldClose(window) == 0) {
-
         // setting `loop_start` to calculate `elapsed_time` later
         auto loop_start = std::chrono::steady_clock::now();
+
+        // clearing last frame
+        gl::glClearColor(0, 0, 0, 0);
+        gl::glClear(gl::GL_COLOR_BUFFER_BIT);
 
         glfwPollEvents();
 
@@ -95,17 +93,11 @@ main() -> int
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // current frame time using imgui
-        ImGui::Text("%dms", elapsed_time);
+        
+        
 
         // rendering imgui windows
         ImGui::Render();
-        
-        // clearing last frame
-        gl::glClearColor(0, 0, 0, 0);
-        gl::glClear(gl::GL_COLOR_BUFFER_BIT);
-
-        // drawing imgui windows on current frame
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
@@ -115,8 +107,10 @@ main() -> int
         elapsed_time  = std::chrono::duration_cast<std::chrono::milliseconds>(loop_end - loop_start).count();
     }
 
-    gl::glDisableVertexAttribArray(0);
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
 
     glfwTerminate();
+    
     return 0;
 }
