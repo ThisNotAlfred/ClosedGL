@@ -1,3 +1,5 @@
+#define GLM_ENABLE_EXPERIMENTAL
+
 #include "closed_gl.hpp"
 
 #include "mesh.hpp"
@@ -5,9 +7,12 @@
 
 #include <chrono>
 #include <format>
+#include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
+#include <numbers>
 #include <print>
+#include <glm/gtx/euler_angles.hpp>
 
 static int g_width = 1600, g_height = 900;
 
@@ -57,6 +62,8 @@ main() -> int
 
     glfwSetKeyCallback(window, key_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
+    glfwSetCursorPos(window, g_width / 2, g_height / 2);
 
     glfwMakeContextCurrent(window);
 
@@ -114,14 +121,15 @@ main() -> int
     auto mat_model = glm::mat4(1);
 
     glm::vec3 cam_pos   = glm::vec3(0.0F, 0.0F, 10.0F);
-    glm::vec3 cam_front = glm::vec3(0.0F, 0.0F, -1.0F);
     glm::vec3 cam_up    = glm::vec3(0.0F, 1.0F, 0.0F);
-    float cam_speed     = 0.75;
+    float cam_speed_zoom = 10;
+    float cam_speed_yaw  = 1;
+    float cam_speed_pitch = 1;
 
     // main loop
     float dt = 0;
     while (glfwWindowShouldClose(window) == 0) {
-        // setting `loop_start` to calculate `elapsed_time` later
+        // setting `loop_start` to calculate `dt` later
         auto loop_start = std::chrono::high_resolution_clock::now();
 
         // clearing last frame
@@ -130,19 +138,24 @@ main() -> int
 
         glfwPollEvents();
 
+        double mousex, mousey;
+        glfwGetCursorPos(window, &mousex, &mousey);
+        
+        auto xoff      = (float)mousex / ((float)g_width/ 2) - 1.0;
+        auto yoff      = (float)mousey / ((float)g_height / 2) - 1.0;
+
+        auto yaw       = -xoff * cam_speed_yaw * std::numbers::pi - std::numbers::pi;
+        auto pitch     = yoff * cam_speed_pitch * std::numbers::pi;
+        auto mat_rot   = glm::eulerAngleYXZ<float>(yaw, pitch, 0.0f);
+        auto cam_front = glm::vec3(mat_rot[2]);
+        auto cam_up    = glm::vec3(mat_rot[1]);
+        
         glm::vec3 cam_right = glm::normalize(glm::cross(cam_front, cam_up));
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-            cam_pos += dt * cam_speed * cam_front;
-        }
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-            cam_pos -= dt * cam_speed * cam_front;
-        }
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-            cam_pos -= dt * cam_speed * cam_right;
-        }
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-            cam_pos += dt * cam_speed * cam_right;
-        }
+        
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) cam_pos += dt * cam_speed_zoom * cam_front;
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) cam_pos -= dt * cam_speed_zoom * cam_front;
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) cam_pos -= dt * cam_speed_zoom * cam_right;
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) cam_pos += dt * cam_speed_zoom * cam_right;
 
         mat_view = glm::lookAt(cam_pos, cam_pos + cam_front, cam_up);
         mat_proj = glm::perspective(glm::radians(30.0F), (float)g_width / (float)g_height, 0.1F, 100.0F);
