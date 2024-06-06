@@ -9,17 +9,20 @@
 #include <iostream>
 #include <print>
 
+static int g_width = 1600, g_height = 900;
+
 auto
 error(int errnum, const char* errmsg)
 {
     std::cerr << errnum << ": " << errmsg << '\n';
 }
 
+
 auto
 framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    // size of the screen
-    // can implement resizing here!
+    g_width = width;
+    g_height = height;
 }
 
 auto
@@ -71,7 +74,7 @@ main() -> int
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 
-    auto* window = glfwCreateWindow(1600, 900, "ClosedGL", nullptr, nullptr);
+    auto* window = glfwCreateWindow(g_width, g_height, "ClosedGL", nullptr, nullptr);
     if (window == nullptr) {
 #ifdef _DEBUG
         std::cerr << "failed to creat the window";
@@ -113,7 +116,7 @@ main() -> int
     auto user_inter = UI(window);
 
     // TODO make this value not hard coded!
-    auto path = std::filesystem::path("C:/Users/Desktop/DragonAttenuation.glb");
+    auto path = std::filesystem::path("DragonAttenuation.glb");
     auto mesh = Mesh(path);
 
     if (mesh.create_buffers()) {
@@ -152,11 +155,17 @@ main() -> int
     auto mat_view  = glm::mat4(1);
     auto mat_model = glm::mat4(1);
 
+
+    glm::vec3 cam_pos   = glm::vec3(0.0f, 0.0f,  10.0f);
+    glm::vec3 cam_front = glm::vec3(0.0f, 0.0f, -1.0f);
+    glm::vec3 cam_up    = glm::vec3(0.0f, 1.0f,  0.0f);
+    float cam_speed     = 0.75;
+
     // main loop
-    unsigned int elapsed_time = 0;
+    float dt = 0;
     while (glfwWindowShouldClose(window) == 0) {
         // setting `loop_start` to calculate `elapsed_time` later
-        auto loop_start = std::chrono::steady_clock::now();
+        auto loop_start = std::chrono::high_resolution_clock::now();
 
         // clearing last frame
         gl::glClearColor(0, 0, 0, 0);
@@ -164,6 +173,19 @@ main() -> int
 
         glfwPollEvents();
 
+        glm::vec3 cam_right = glm::normalize(glm::cross(cam_front, cam_up));
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            cam_pos += dt * cam_speed * cam_front;
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            cam_pos -= dt * cam_speed * cam_front;
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            cam_pos -= dt * cam_speed * cam_right;
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            cam_pos += dt * cam_speed * cam_right;
+
+        mat_view = glm::lookAt(cam_pos, cam_pos + cam_front, cam_up);
+        mat_proj = glm::perspective(glm::radians(30.0f), (float)g_width / (float)g_height, 0.1f, 100.0f);
+        // TODO(StaticSaga): there's a DSA version of those too
         gl::glUseProgram(program);
         gl::glUniformMatrix4fv(0, 1, false, glm::value_ptr(mat_proj));
         gl::glUniformMatrix4fv(1, 1, false, glm::value_ptr(mat_view));
@@ -185,12 +207,13 @@ main() -> int
 
         glfwSwapBuffers(window);
 
-        // setting `time_point` and calculating `elapsed_time`
-        auto loop_end = std::chrono::steady_clock::now();
-        elapsed_time  = std::chrono::duration_cast<std::chrono::milliseconds>(loop_end - loop_start).count();
+        // setting `time_point` and calculating `dt`
+        auto loop_end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<float> time = loop_end - loop_start;
+        dt = time.count();
 
 #ifdef _DEBUG
-        glfwSetWindowTitle(window, std::format("ClosedGL {}ms", elapsed_time).c_str());
+        glfwSetWindowTitle(window, std::format("ClosedGL {}fps", (int)(1.0f / dt)).c_str());
 #endif
     }
 
