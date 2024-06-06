@@ -31,9 +31,8 @@ class Mesh
 
     int indices_count;
 
-    std::vector<unsigned short> indices;
+    std::vector<std::uint32_t> indices;
 
     gl::GLuint vertex_array;
     gl::GLuint vertex_buffer;
-    gl::GLuint index_buffer;
 };

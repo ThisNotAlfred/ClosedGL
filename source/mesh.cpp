@@ -23,9 +23,9 @@ Mesh::create_buffers() -> bool
                     auto& accessor = asset->accessors[primitive.indicesAccessor.value()];
                     this->indices.resize(accessor.count);
 
-                    fastgltf::iterateAccessorWithIndex<unsigned int>(
+                    fastgltf::iterateAccessorWithIndex<std::uint32_t>(
                         asset.get(), accessor,
-                        [&](unsigned int index, std::size_t idx) { this->indices[idx] = index; });
+                        [&](std::uint32_t index, std::size_t idx) { this->indices[idx] = index; });
                 }
 
                 this->indices_count = this->indices.size();
@@ -53,6 +53,8 @@ Mesh::create_buffers() -> bool
                         vertices[idx].normal   = fastgltf::math::fvec3();
                         vertices[idx].uv       = fastgltf::math::fvec2();
                     });
+
+                gl::glUnmapNamedBuffer(this->vertex_buffer);
             }
 
             // TODO: normals and uv coords
@@ -87,13 +89,11 @@ Mesh::destroy() -> void
 {
     gl::glDeleteBuffers(1, &this->vertex_array);
     gl::glDeleteBuffers(1, &this->vertex_buffer);
-    gl::glDeleteBuffers(1, &this->index_buffer);
 }
 
 auto
 Mesh::draw() const -> void
 {
     gl::glBindVertexArray(this->vertex_array);
-    gl::glDrawElements(gl::GL_TRIANGLES, this->indices_count, gl::GL_UNSIGNED_SHORT, this->indices.data());
-    gl::glBindVertexArray(0);
+    gl::glDrawElements(gl::GL_TRIANGLES, this->indices_count, gl::GL_UNSIGNED_INT, this->indices.data());
 }

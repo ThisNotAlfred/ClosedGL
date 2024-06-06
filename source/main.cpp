@@ -1,11 +1,12 @@
 #include "closed_gl.hpp"
 
+#include "mesh.hpp"
 #include "user_interface.hpp"
 
 #include <chrono>
 #include <format>
-#include <iostream>
 #include <glm/gtc/type_ptr.hpp>
+#include <iostream>
 #include <print>
 
 auto
@@ -111,28 +112,13 @@ main() -> int
 
     auto user_inter = UI(window);
 
+    // TODO make this value not hard coded!
+    auto path = std::filesystem::path("C:/Users/Desktop/DragonAttenuation.glb");
+    auto mesh = Mesh(path);
 
-    float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f };
-    uint32_t indices[] = { 0, 1, 2 };
-
-    gl::GLuint vbo, vao, ibo;
-    gl::glCreateBuffers(1, &vbo);
-    gl::glNamedBufferStorage(vbo, sizeof(vertices), vertices, gl::GL_DYNAMIC_STORAGE_BIT);
-    
-    gl::glCreateBuffers(1, &ibo);
-    gl::glNamedBufferStorage(ibo, sizeof(indices), indices, gl::GL_DYNAMIC_STORAGE_BIT);
-
-    gl::glCreateVertexArrays(1, &vao);
-
-    gl::glVertexArrayVertexBuffer(vao, 0, vbo, 0, sizeof(float) * 3);
-    gl::glVertexArrayElementBuffer(vao, ibo);
-
-    gl::glEnableVertexArrayAttrib(vao, 0);
-    gl::glVertexArrayAttribFormat(vao, 0, 3, gl::GL_FLOAT, false, 0);
-    gl::glVertexArrayAttribBinding(vao, 0, 0);
+    if (mesh.create_buffers()) {
+        std::cerr << "failed to load the mesh\n";
+    }
 
     auto compile_shader = [](const char* str, gl::GLenum type) {
         auto shader = gl::glCreateShader(type);
@@ -143,7 +129,7 @@ main() -> int
         if (out == 1) {
             return shader;
         }
-        
+
         gl::GLint length = 0;
         gl::glGetShaderiv(shader, gl::GL_INFO_LOG_LENGTH, &length);
         char* log = (char*)calloc(1, length);
@@ -152,8 +138,8 @@ main() -> int
         assert(false);
     };
 
-    auto vert = compile_shader(vert_shader, gl::GL_VERTEX_SHADER);
-    auto frag = compile_shader(frag_shader, gl::GL_FRAGMENT_SHADER);
+    auto vert    = compile_shader(vert_shader, gl::GL_VERTEX_SHADER);
+    auto frag    = compile_shader(frag_shader, gl::GL_FRAGMENT_SHADER);
     auto program = gl::glCreateProgram();
     gl::glAttachShader(program, vert);
     gl::glAttachShader(program, frag);
@@ -178,15 +164,12 @@ main() -> int
 
         glfwPollEvents();
 
-        // TODO(StaticSaga): there's a DSA version of those too
         gl::glUseProgram(program);
         gl::glUniformMatrix4fv(0, 1, false, glm::value_ptr(mat_proj));
         gl::glUniformMatrix4fv(1, 1, false, glm::value_ptr(mat_view));
         gl::glUniformMatrix4fv(2, 1, false, glm::value_ptr(mat_model));
-        
-        gl::glBindVertexArray(vao);
-        gl::glBindBuffer(gl::GL_ELEMENT_ARRAY_BUFFER, ibo);
-        gl::glDrawElements(gl::GL_TRIANGLES, sizeof(indices) / sizeof(uint32_t), gl::GL_UNSIGNED_INT, nullptr);
+
+        mesh.draw();
 
         // start imgui frame
         ImGui_ImplOpenGL3_NewFrame();
