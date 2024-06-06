@@ -1,15 +1,14 @@
-#include <tools.hpp>
+#include "tools.hpp"
 
-#include <fstream>
 #include <filesystem>
+#include <fstream>
 
 auto
-read_file_binary(std::filesystem::path& path) -> std::vector<unsigned char>
+read_file_binary(std::filesystem::path& path) -> std::vector<char>
 {
-    std::ifstream file(path, std::ios::in | std::ios::binary);
+    std::ifstream file(path, std::ios::in);
 
-    std::vector<unsigned char> file_chars((std::istreambuf_iterator<char>(file)),
-                                          std::istreambuf_iterator<char>());
+    std::vector<char> file_content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
-    return file_chars;
+    return file_content;
 }

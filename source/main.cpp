@@ -9,10 +9,10 @@
 #include <format>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/euler_angles.hpp>
 #include <iostream>
 #include <numbers>
 #include <print>
-#include <glm/gtx/euler_angles.hpp>
 
 static int g_width = 1600, g_height = 900;
 
@@ -50,6 +50,7 @@ main() -> int
     // setting the opengl version to 4.6
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     auto* window = glfwCreateWindow(g_width, g_height, "ClosedGL", nullptr, nullptr);
     if (window == nullptr) {
@@ -62,7 +63,7 @@ main() -> int
 
     glfwSetKeyCallback(window, key_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPos(window, g_width / 2, g_height / 2);
 
     glfwMakeContextCurrent(window);
@@ -102,9 +103,8 @@ main() -> int
     }
 
     // here shaders from `shaders/`
-
-    auto vert_path = std::filesystem::path("shaders/vert.slang.spv");
-    auto frag_path = std::filesystem::path("shaders/frag.slang.spv");
+    auto vert_path = std::filesystem::path("C:\\Users\\Alfred\\source\\repos\\ClosedGL\\shaders\\vert.glsl");
+    auto frag_path = std::filesystem::path("C:\\Users\\Alfred\\source\\repos\\ClosedGL\\shaders\\frag.glsl");
     auto vert      = compile_shader(vert_path, gl::GL_VERTEX_SHADER);
     auto frag      = compile_shader(frag_path, gl::GL_FRAGMENT_SHADER);
     auto program   = gl::glCreateProgram();
@@ -120,10 +120,10 @@ main() -> int
     auto mat_view  = glm::mat4(1);
     auto mat_model = glm::mat4(1);
 
-    glm::vec3 cam_pos   = glm::vec3(0.0F, 0.0F, 10.0F);
-    glm::vec3 cam_up    = glm::vec3(0.0F, 1.0F, 0.0F);
-    float cam_speed_zoom = 10;
-    float cam_speed_yaw  = 1;
+    glm::vec3 cam_pos     = glm::vec3(0.0F, 0.0F, 10.0F);
+    glm::vec3 cam_up      = glm::vec3(0.0F, 1.0F, 0.0F);
+    float cam_speed_zoom  = 10;
+    float cam_speed_yaw   = 1;
     float cam_speed_pitch = 1;
 
     // main loop
@@ -140,22 +140,26 @@ main() -> int
 
         double mousex, mousey;
         glfwGetCursorPos(window, &mousex, &mousey);
-        
-        auto xoff      = (float)mousex / ((float)g_width/ 2) - 1.0;
-        auto yoff      = (float)mousey / ((float)g_height / 2) - 1.0;
+
+        auto xoff = (float)mousex / ((float)g_width / 2) - 1.0;
+        auto yoff = (float)mousey / ((float)g_height / 2) - 1.0;
 
         auto yaw       = -xoff * cam_speed_yaw * std::numbers::pi - std::numbers::pi;
         auto pitch     = yoff * cam_speed_pitch * std::numbers::pi;
         auto mat_rot   = glm::eulerAngleYXZ<float>(yaw, pitch, 0.0f);
         auto cam_front = glm::vec3(mat_rot[2]);
         auto cam_up    = glm::vec3(mat_rot[1]);
-        
+
         glm::vec3 cam_right = glm::normalize(glm::cross(cam_front, cam_up));
-        
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) cam_pos += dt * cam_speed_zoom * cam_front;
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) cam_pos -= dt * cam_speed_zoom * cam_front;
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) cam_pos -= dt * cam_speed_zoom * cam_right;
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) cam_pos += dt * cam_speed_zoom * cam_right;
+
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            cam_pos += dt * cam_speed_zoom * cam_front;
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            cam_pos -= dt * cam_speed_zoom * cam_front;
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            cam_pos -= dt * cam_speed_zoom * cam_right;
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            cam_pos += dt * cam_speed_zoom * cam_right;
 
         mat_view = glm::lookAt(cam_pos, cam_pos + cam_front, cam_up);
         mat_proj = glm::perspective(glm::radians(30.0F), (float)g_width / (float)g_height, 0.1F, 100.0F);

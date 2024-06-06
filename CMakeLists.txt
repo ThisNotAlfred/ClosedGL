@@ -167,28 +167,3 @@ set_target_properties(
 )
 
 install(TARGETS ClosedGl)
-
-# -----------------------------
-
-# slang
-find_program(slangc "slangc.exe")
-
-# getting list of all shaders
-file(GLOB shader_SOURCES "${CMAKE_SOURCE_DIR}/shaders/*.slang")
-
-# compiling shaders into spirv into `bin/shaders` one by one
-foreach(shader_SOURCE ${shader_SOURCES})
-    # getting the name of the shader file
-    get_filename_component(shader_NAME ${shader_SOURCE} NAME)
-
-    # make `bin/shaders` directory
-    file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/shaders)
-
-    # compiling it into spirv
-    add_custom_command(
-        TARGET ClosedGl
-        PRE_BUILD
-        COMMAND "${slangc}" 
-        ARGS "${shader_SOURCE}" -profile glsl_460 -target spirv -o "${CMAKE_SOURCE_DIR}/bin/shaders/${shader_NAME}.spv" -entry main 
-    )
-endforeach()

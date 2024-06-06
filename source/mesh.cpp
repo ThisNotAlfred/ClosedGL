@@ -104,14 +104,16 @@ auto
 compile_shader(std::filesystem::path& path, gl::GLenum shader_type) -> gl::GLuint
 {
     auto shader_content = read_file_binary(path);
+    const auto ahder_size     = shader_content.size();
+    auto shader_pointer = shader_content.data();
 
     auto shader = gl::glCreateShader(shader_type);
 
-    gl::glShaderBinary(1, &shader, gl::GL_SHADER_BINARY_FORMAT_SPIR_V, shader_content.data(), shader_content.size());
+    gl::glShaderSource(shader, 1, &shader_pointer, nullptr);
 
-    gl::glSpecializeShader(shader, "main", 0, nullptr, nullptr);
+    gl::glCompileShader(shader);
 
-    auto is_compiled = gl::GL_FALSE;;
+    auto is_compiled = gl::GL_FALSE;
     gl::glGetShaderiv(shader, gl::GLenum::GL_COMPILE_STATUS, &is_compiled);
     if (is_compiled == gl::GL_FALSE) {
         auto max_length = 0;
