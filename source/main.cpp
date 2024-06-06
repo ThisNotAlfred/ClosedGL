@@ -21,7 +21,7 @@ error(int errnum, const char* errmsg)
 auto
 framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    g_width = width;
+    g_width  = width;
     g_height = height;
 }
 
@@ -108,8 +108,7 @@ main() -> int
     glbinding::initialize(glfwGetProcAddress, false);
     glbinding::aux::enableGetErrorCallback();
 
-    std::cout << '\n'
-              << "OpenGL Version:  " << glbinding::aux::ContextInfo::version() << '\n'
+    std::cout << "OpenGL Version:  " << glbinding::aux::ContextInfo::version() << '\n'
               << "OpenGL Vendor:   " << glbinding::aux::ContextInfo::vendor() << '\n'
               << "OpenGL Renderer: " << glbinding::aux::ContextInfo::renderer() << '\n';
 
@@ -120,7 +119,7 @@ main() -> int
     auto mesh = Mesh(path);
 
     if (mesh.create_buffers()) {
-        std::cerr << "failed to load the mesh\n";
+        std::println(stderr, "failed to load the mesh\n");
     }
 
     auto compile_shader = [](const char* str, gl::GLenum type) {
@@ -156,9 +155,9 @@ main() -> int
     auto mat_model = glm::mat4(1);
 
 
-    glm::vec3 cam_pos   = glm::vec3(0.0f, 0.0f,  10.0f);
-    glm::vec3 cam_front = glm::vec3(0.0f, 0.0f, -1.0f);
-    glm::vec3 cam_up    = glm::vec3(0.0f, 1.0f,  0.0f);
+    glm::vec3 cam_pos   = glm::vec3(0.0F, 0.0F, 10.0F);
+    glm::vec3 cam_front = glm::vec3(0.0F, 0.0F, -1.0F);
+    glm::vec3 cam_up    = glm::vec3(0.0F, 1.0F, 0.0F);
     float cam_speed     = 0.75;
 
     // main loop
@@ -174,17 +173,21 @@ main() -> int
         glfwPollEvents();
 
         glm::vec3 cam_right = glm::normalize(glm::cross(cam_front, cam_up));
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
             cam_pos += dt * cam_speed * cam_front;
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        }
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
             cam_pos -= dt * cam_speed * cam_front;
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        }
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
             cam_pos -= dt * cam_speed * cam_right;
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        }
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
             cam_pos += dt * cam_speed * cam_right;
+        }
 
         mat_view = glm::lookAt(cam_pos, cam_pos + cam_front, cam_up);
-        mat_proj = glm::perspective(glm::radians(30.0f), (float)g_width / (float)g_height, 0.1f, 100.0f);
+        mat_proj = glm::perspective(glm::radians(30.0F), (float)g_width / (float)g_height, 0.1F, 100.0F);
         // TODO(StaticSaga): there's a DSA version of those too
         gl::glUseProgram(program);
         gl::glUniformMatrix4fv(0, 1, false, glm::value_ptr(mat_proj));
@@ -208,12 +211,12 @@ main() -> int
         glfwSwapBuffers(window);
 
         // setting `time_point` and calculating `dt`
-        auto loop_end = std::chrono::high_resolution_clock::now();
+        auto loop_end                     = std::chrono::high_resolution_clock::now();
         std::chrono::duration<float> time = loop_end - loop_start;
-        dt = time.count();
+        dt                                = time.count();
 
 #ifdef _DEBUG
-        glfwSetWindowTitle(window, std::format("ClosedGL {}fps", (int)(1.0f / dt)).c_str());
+        glfwSetWindowTitle(window, std::format("ClosedGL {}fps", (int)(1.0F / dt)).c_str());
 #endif
     }
 

@@ -1,5 +1,7 @@
 #include "mesh.hpp"
 
+#include "tools.hpp"
+
 auto
 Mesh::create_buffers() -> bool
 {
@@ -48,7 +50,7 @@ Mesh::create_buffers() -> bool
                     static_cast<Vertex*>(gl::glMapNamedBuffer(this->vertex_buffer, gl::GLenum::GL_WRITE_ONLY));
 
                 fastgltf::iterateAccessorWithIndex<fastgltf::math::fvec3>(
-                    asset.get(), position_accesor, [&](fastgltf::math::fvec3 pos, std::size_t idx) {
+                    asset.get(), position_accesor, [&](const fastgltf::math::fvec3& pos, std::size_t idx) {
                         vertices[idx].position = pos;
                         vertices[idx].normal   = fastgltf::math::fvec3();
                         vertices[idx].uv       = fastgltf::math::fvec2();
@@ -96,4 +98,32 @@ Mesh::draw() const -> void
 {
     gl::glBindVertexArray(this->vertex_array);
     gl::glDrawElements(gl::GL_TRIANGLES, this->indices_count, gl::GL_UNSIGNED_INT, this->indices.data());
+}
+
+auto
+compile_shader(std::filesystem::path& path, gl::GLenum shader_type) -> gl::GLuint
+{
+    auto shader_content = read_file_binary(path);
+
+    auto shader = gl::glCreateShader(shader_type);
+
+    gl::glShaderBinary(1, &shader, gl::GL_SHADER_BINARY_FORMAT_SPIR_V, shader_content.data(), shader_content.size());
+
+    gl::glSpecializeShader(shader, "main", 0, nullptr, nullptr);
+
+    auto is_compiled = gl::GL_FALSE;;
+    gl::glGetShaderiv(shader, gl::GLenum::GL_COMPILE_STATUS, &is_compiled);
+    if (is_compiled == gl::GL_FALSE) {
+        auto max_length = 0;
+        gl::glGetShaderiv(shader, gl::GL_INFO_LOG_LENGTH, &max_length);
+
+        std::vector<char> infolog(max_length);
+        gl::glGetShaderInfoLog(shader, max_length, &max_length, infolog.data());
+
+        gl::glDeleteShader(shader);
+
+        return -1;
+    }
+
+    return shader;
 }
