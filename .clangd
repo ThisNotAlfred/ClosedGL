@@ -1,8 +1,10 @@
 CompileFlags:
     Compiler: clang++
 Diagnostics:
+  UnusedIncludes: None
   ClangTidy:
-    Add: [ modernize*, performance*, readability* ]
+    Add: [ modernize*, performance*, readability*, bugprone* ]
+    Remove: [android*,  readability-magic-numbers, bugprone-easily-swappable-parameters ]
     FastCheckFilter: Loose
 InlayHints:
   BlockEnd: No
