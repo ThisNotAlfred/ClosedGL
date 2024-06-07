@@ -132,8 +132,11 @@ main() -> int
         auto loop_start = std::chrono::high_resolution_clock::now();
 
         // clearing last frame
-        gl::glClearColor(0, 0, 0, 0);
-        gl::glClear(gl::GL_COLOR_BUFFER_BIT);
+        gl::glClearColor(0, 0, 0, 1);
+    	gl::glClearDepth(1);
+	    gl::glEnable(gl::GL_DEPTH_TEST);
+	    gl::glDepthFunc(gl::GL_LEQUAL);
+        gl::glClear(gl::GL_COLOR_BUFFER_BIT | gl::GL_DEPTH_BUFFER_BIT);
 
         glfwPollEvents();
 
