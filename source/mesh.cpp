@@ -38,7 +38,14 @@ Mesh::create_buffers() -> bool
                 const auto* position_it = primitive.findAttribute("POSITION");
                 auto& position_accesor  = asset->accessors[position_it->second];
 
+                const auto* normal_it = primitive.findAttribute("NROMAL");
+                auto& normal_accesor  = asset->accessors[position_it->second];
+
                 if (!position_accesor.bufferViewIndex.has_value()) {
+                    continue;
+                }
+
+                if (!normal_accesor.bufferViewIndex.has_value()) {
                     continue;
                 }
 
@@ -50,16 +57,19 @@ Mesh::create_buffers() -> bool
                     static_cast<Vertex*>(gl::glMapNamedBuffer(this->vertex_buffer, gl::GLenum::GL_WRITE_ONLY));
 
                 fastgltf::iterateAccessorWithIndex<fastgltf::math::fvec3>(
-                    asset.get(), position_accesor, [&](const fastgltf::math::fvec3& pos, std::size_t idx) {
-                        vertices[idx].position = pos;
-                        vertices[idx].normal   = fastgltf::math::fvec3();
-                        vertices[idx].uv       = fastgltf::math::fvec2();
+                    asset.get(), position_accesor,
+                    [&](const fastgltf::math::fvec3& pos, std::size_t idx) { vertices[idx].position = pos; });
+
+                fastgltf::iterateAccessorWithIndex<fastgltf::math::fvec3>(
+                    asset.get(), normal_accesor, [&](const fastgltf::math::fvec3& norm, std::size_t idx) {
+                        vertices[idx].normal = norm;
+                        vertices[idx].uv     = fastgltf::math::fvec2();
                     });
 
                 gl::glUnmapNamedBuffer(this->vertex_buffer);
             }
 
-            // TODO: normals and uv coords
+            // TODO: textures
         }
     }
 
@@ -103,13 +113,11 @@ Mesh::draw() const -> void
 auto
 compile_shader(std::filesystem::path& path, gl::GLenum shader_type) -> gl::GLuint
 {
-    auto shader_content = read_file_binary(path);
-    const auto ahder_size     = shader_content.size();
-    auto shader_pointer = shader_content.data();
+    std::array<char*, 1> shader_contents = { read_file_binary(path).data() };
 
     auto shader = gl::glCreateShader(shader_type);
 
-    gl::glShaderSource(shader, 1, &shader_pointer, nullptr);
+    gl::glShaderSource(shader, shader_contents.size(), shader_contents.data(), nullptr);
 
     gl::glCompileShader(shader);
 

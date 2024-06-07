@@ -103,8 +103,8 @@ main() -> int
     }
 
     // here shaders from `shaders/`
-    auto vert_path = std::filesystem::path("C:\\Users\\Alfred\\source\\repos\\ClosedGL\\shaders\\vert.glsl");
-    auto frag_path = std::filesystem::path("C:\\Users\\Alfred\\source\\repos\\ClosedGL\\shaders\\frag.glsl");
+    auto vert_path = std::filesystem::path("../shaders/vert.glsl");
+    auto frag_path = std::filesystem::path("../shaders/frag.glsl");
     auto vert      = compile_shader(vert_path, gl::GL_VERTEX_SHADER);
     auto frag      = compile_shader(frag_path, gl::GL_FRAGMENT_SHADER);
     auto program   = gl::glCreateProgram();
@@ -163,6 +163,7 @@ main() -> int
 
         mat_view = glm::lookAt(cam_pos, cam_pos + cam_front, cam_up);
         mat_proj = glm::perspective(glm::radians(30.0F), (float)g_width / (float)g_height, 0.1F, 100.0F);
+
         // TODO(StaticSaga): there's a DSA version of those too
         gl::glUseProgram(program);
         gl::glUniformMatrix4fv(0, 1, false, glm::value_ptr(mat_proj));
