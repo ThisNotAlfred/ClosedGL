@@ -1,6 +1,12 @@
 #include "mesh.hpp"
 
+#include "fastgltf/types.hpp"
+#include "glbinding/gl/enum.h"
+#include "glbinding/gl/functions.h"
 #include "tools.hpp"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 auto
 Mesh::create_buffers() -> bool
@@ -16,6 +22,41 @@ Mesh::create_buffers() -> bool
     if (auto error = asset.error(); error != fastgltf::Error::None) {
         return false;
     }
+    
+    for (auto& image : asset->images) {
+        gl::GLuint texture;
+        glCreateTextures(gl::GL_TEXTURE_2D, 1, &texture);
+        std::visit(fastgltf::visitor {
+            [](auto& arg) {},
+            [&](fastgltf::sources::URI& filePath) {
+                // TODO:
+                assert(false);
+            },
+            [&](fastgltf::sources::Array& vector) {
+                assert(false);
+            },
+            [&](fastgltf::sources::BufferView& view) {
+                auto& buf_view = asset->bufferViews[view.bufferViewIndex];
+                auto& buffer = asset->buffers[buf_view.bufferIndex];
+                // TODO(StaticSaga): i took this code from an example, this is doing needless copying which should be avoided
+                std::visit(fastgltf::visitor {
+                    [](auto& arg) {},
+                    [&](fastgltf::sources::Array& array) {
+                        int width, height, channels;
+                        unsigned char* data = stbi_load_from_memory(array.bytes.data() + buf_view.byteOffset, (int)buf_view.byteLength, &width, &height, &channels, 4);
+                        int levels = 1 + (int)log2(std::max(width, height));
+                        glTextureStorage2D(texture, levels, gl::GL_RGBA8, width, height);
+                        glTextureSubImage2D(texture, 0, 0, 0, width, height, gl::GL_RGBA, gl::GL_UNSIGNED_BYTE, data);
+                        stbi_image_free(data);
+                    }
+                }, buffer.data);
+            },
+        }, image.data);
+
+        gl::glGenerateTextureMipmap(texture);
+        this->textures.push_back(texture);
+    }
+
     for (const auto& mesh : asset->meshes) {
         for (auto&& primitive : mesh.primitives) {
 
@@ -36,40 +77,40 @@ Mesh::create_buffers() -> bool
             // vertices
             {
                 const auto* position_it = primitive.findAttribute("POSITION");
-                auto& position_accesor  = asset->accessors[position_it->second];
+                auto& position_accessor  = asset->accessors[position_it->second];
 
-                const auto* normal_it = primitive.findAttribute("NROMAL");
-                auto& normal_accesor  = asset->accessors[position_it->second];
+                const auto* normal_it = primitive.findAttribute("NORMAL");
+                auto& normal_accessor  = asset->accessors[position_it->second];
 
-                if (!position_accesor.bufferViewIndex.has_value()) {
-                    continue;
-                }
+                const auto* uv_it = primitive.findAttribute("TEXCOORD_0");
+                auto& uv_accessor  = asset->accessors[uv_it->second];
 
-                if (!normal_accesor.bufferViewIndex.has_value()) {
-                    continue;
-                }
+                assert(position_accessor.bufferViewIndex.has_value());
+                assert(normal_accessor.bufferViewIndex.has_value());                
+                assert(uv_accessor.bufferViewIndex.has_value());                
 
                 gl::glCreateBuffers(1, &this->vertex_buffer);
-                gl::glNamedBufferData(this->vertex_buffer, position_accesor.count * sizeof(Vertex), nullptr,
+                gl::glNamedBufferData(this->vertex_buffer, position_accessor.count * sizeof(Vertex), nullptr,
                                       gl::GLenum::GL_STATIC_DRAW);
 
                 auto* vertices =
                     static_cast<Vertex*>(gl::glMapNamedBuffer(this->vertex_buffer, gl::GLenum::GL_WRITE_ONLY));
 
                 fastgltf::iterateAccessorWithIndex<fastgltf::math::fvec3>(
-                    asset.get(), position_accesor,
+                    asset.get(), position_accessor,
                     [&](const fastgltf::math::fvec3& pos, std::size_t idx) { vertices[idx].position = pos; });
 
                 fastgltf::iterateAccessorWithIndex<fastgltf::math::fvec3>(
-                    asset.get(), normal_accesor, [&](const fastgltf::math::fvec3& norm, std::size_t idx) {
+                    asset.get(), normal_accessor, [&](const fastgltf::math::fvec3& norm, std::size_t idx) {
                         vertices[idx].normal = norm;
-                        vertices[idx].uv     = fastgltf::math::fvec2();
+                    });
+                fastgltf::iterateAccessorWithIndex<fastgltf::math::fvec2>(
+                    asset.get(), uv_accessor, [&](const fastgltf::math::fvec2& uv, std::size_t idx) {
+                        vertices[idx].uv = uv;
                     });
 
                 gl::glUnmapNamedBuffer(this->vertex_buffer);
             }
-
-            // TODO: textures
         }
     }
 
@@ -106,7 +147,12 @@ Mesh::destroy() -> void
 auto
 Mesh::draw() const -> void
 {
+    // TODO(StaticSaga): do not hardcode this
+    int unit = 0;
+    gl::glBindTextureUnit(unit, this->textures[1]);
     gl::glBindVertexArray(this->vertex_array);
+    gl::glUniform1i(3, unit);
+
     gl::glDrawElements(gl::GL_TRIANGLES, this->indices_count, gl::GL_UNSIGNED_INT, this->indices.data());
 }
 

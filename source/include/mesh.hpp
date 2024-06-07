@@ -25,13 +25,14 @@ class Mesh
     // TODO implementing other draw types .e.g instancing
     auto draw() const -> void;
     auto destroy() -> void;
-
         private:
+
     std::filesystem::path path;
 
     int indices_count;
 
     std::vector<std::uint32_t> indices;
+    std::vector<gl::GLuint> textures;
 
     gl::GLuint vertex_array;
     gl::GLuint vertex_buffer;

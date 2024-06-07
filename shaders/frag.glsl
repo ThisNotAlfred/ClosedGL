@@ -7,7 +7,9 @@ struct fs_input {
 };
 
 layout (location = 0) in fs_input frag_in;
+
 layout (location = 1) uniform mat4 view;
+layout (location = 3) uniform sampler2D tex_1;
 
 layout (location = 0) out vec4 color;
 
@@ -60,9 +62,9 @@ void main() {
     vec3 directional_light = vec3(1.0f, 0.4f, 0.5f);
     float roughness = 0.4;
     
-    vec3 frfd = BRDF(directional_light, view, frag_in.normal, out_color, roughness, vec3(0.3));
+    // vec3 frfd = BRDF(directional_light, view, frag_in.normal, out_color, roughness, vec3(0.3));
 
-    out_color = frfd;
+    out_color = vec3(texture(tex_1, frag_in.uv));
 
     color = vec4(out_color, 1.0f);
 }
