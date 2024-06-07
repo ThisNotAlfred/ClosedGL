@@ -113,11 +113,13 @@ Mesh::draw() const -> void
 auto
 compile_shader(std::filesystem::path& path, gl::GLenum shader_type) -> gl::GLuint
 {
-    std::array<char*, 1> shader_contents = { read_file_binary(path).data() };
+    auto data = read_file_binary(path);
 
     auto shader = gl::glCreateShader(shader_type);
-
-    gl::glShaderSource(shader, shader_contents.size(), shader_contents.data(), nullptr);
+    
+    char* data_as_ptr = data.data();
+    int size = data.size();
+    gl::glShaderSource(shader, 1, &data_as_ptr, &size);
 
     gl::glCompileShader(shader);
 
