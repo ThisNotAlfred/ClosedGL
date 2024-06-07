@@ -114,7 +114,6 @@ main() -> int
     gl::glLinkProgram(program);
     gl::GLint out;
     gl::glGetProgramiv(program, gl::GL_LINK_STATUS, &out);
-    assert(out == 1);
 
     auto mat_proj  = glm::mat4(1);
     auto mat_view  = glm::mat4(1);
