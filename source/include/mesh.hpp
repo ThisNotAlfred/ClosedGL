@@ -2,7 +2,7 @@
 
 #include "closed_gl.hpp"
 
-#include "fastgltf/tools.hpp"
+#include <fastgltf/tools.hpp>
 #include <fastgltf/core.hpp>
 #include <fastgltf/types.hpp>
 
@@ -38,4 +38,4 @@ class Mesh
     gl::GLuint vertex_buffer;
 };
 
-auto compile_shader(std::filesystem::path& path, gl::GLenum shader_type) -> gl::GLuint;
+auto compile_program(std::filesystem::path& path, gl::GLenum shader_type) -> gl::GLuint;

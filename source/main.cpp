@@ -104,16 +104,13 @@ main() -> int
 
     // here shaders from `shaders/`
     auto vert_path = std::filesystem::path("../shaders/vert.glsl");
-    auto frag_path = std::filesystem::path("../shaders/frag.glsl");
-    auto vert      = compile_shader(vert_path, gl::GL_VERTEX_SHADER);
-    auto frag      = compile_shader(frag_path, gl::GL_FRAGMENT_SHADER);
-    auto program   = gl::glCreateProgram();
+    auto vert      = compile_program(vert_path, gl::GL_VERTEX_SHADER);
 
-    gl::glAttachShader(program, vert);
-    gl::glAttachShader(program, frag);
-    gl::glLinkProgram(program);
-    gl::GLint out;
-    gl::glGetProgramiv(program, gl::GL_LINK_STATUS, &out);
+    auto frag_path = std::filesystem::path("../shaders/frag.glsl");
+    auto frag      = compile_program(frag_path, gl::GL_FRAGMENT_SHADER);
+
+    gl::GLuint program_pipline;
+    gl::glGenProgramPipelines(1, &program_pipline);
 
     auto mat_proj  = glm::mat4(1);
     auto mat_view  = glm::mat4(1);
@@ -133,9 +130,9 @@ main() -> int
 
         // clearing last frame
         gl::glClearColor(0, 0, 0, 1);
-    	gl::glClearDepth(1);
-	    gl::glEnable(gl::GL_DEPTH_TEST);
-	    gl::glDepthFunc(gl::GL_LEQUAL);
+        gl::glClearDepth(1);
+        gl::glEnable(gl::GL_DEPTH_TEST);
+        gl::glDepthFunc(gl::GL_LEQUAL);
         gl::glClear(gl::GL_COLOR_BUFFER_BIT | gl::GL_DEPTH_BUFFER_BIT);
 
         glfwPollEvents();
@@ -166,8 +163,10 @@ main() -> int
         mat_view = glm::lookAt(cam_pos, cam_pos + cam_front, cam_up);
         mat_proj = glm::perspective(glm::radians(30.0F), (float)g_width / (float)g_height, 0.1F, 100.0F);
 
-        // TODO(StaticSaga): there's a DSA version of those too
-        gl::glUseProgram(program);
+        gl::glUseProgramStages(program_pipline, gl::GL_VERTEX_SHADER_BIT, vert);
+        gl::glUseProgramStages(program_pipline, gl::GL_FRAGMENT_SHADER_BIT, frag);
+        gl::glBindProgramPipeline(program_pipline);
+
         gl::glUniformMatrix4fv(0, 1, false, glm::value_ptr(mat_proj));
         gl::glUniformMatrix4fv(1, 1, false, glm::value_ptr(mat_view));
         gl::glUniformMatrix4fv(2, 1, false, glm::value_ptr(mat_model));

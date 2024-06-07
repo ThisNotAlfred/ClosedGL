@@ -1,12 +1,11 @@
 #include "mesh.hpp"
 
-#include "fastgltf/types.hpp"
-#include "glbinding/gl/enum.h"
-#include "glbinding/gl/functions.h"
 #include "tools.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+
+#include <print>
 
 auto
 Mesh::create_buffers() -> bool
@@ -157,31 +156,43 @@ Mesh::draw() const -> void
 }
 
 auto
-compile_shader(std::filesystem::path& path, gl::GLenum shader_type) -> gl::GLuint
+compile_program(std::filesystem::path& path, gl::GLenum shader_type) -> gl::GLuint
 {
     auto content                         = read_file_binary(path);
     std::array<char*, 1> shader_contents = { content.data() };
-    std::array<int, 1> shader_size       = { static_cast<int>(content.size()) };
+
+    auto program = gl::glCreateProgram();
+    gl::glProgramParameteri(program, gl::GL_PROGRAM_SEPARABLE, gl::GL_TRUE);
 
     auto shader = gl::glCreateShader(shader_type);
-
-    gl::glShaderSource(shader, shader_contents.size(), shader_contents.data(), shader_size.data());
-
+    gl::glShaderSource(shader, 1, shader_contents.data(), 0);
     gl::glCompileShader(shader);
 
-    auto is_compiled = gl::GL_FALSE;
-    gl::glGetShaderiv(shader, gl::GLenum::GL_COMPILE_STATUS, &is_compiled);
+    gl::GLboolean is_compiled;
+    gl::glGetShaderiv(shader, gl::GL_COMPILE_STATUS, &is_compiled);
     if (is_compiled == gl::GL_FALSE) {
-        auto max_length = 0;
+        std::print(stderr, "shader compilation failed due to:\n");
+        
+        gl::GLint max_length;
         gl::glGetShaderiv(shader, gl::GL_INFO_LOG_LENGTH, &max_length);
 
-        std::vector<char> infolog(max_length);
-        gl::glGetShaderInfoLog(shader, max_length, &max_length, infolog.data());
+        std::vector<char> error_log(max_length);
+        gl::glGetShaderInfoLog(shader, max_length, &max_length, &error_log[0]);
+
+        std::string_view error(error_log);
+        std::print(stderr, "{}", error);
 
         gl::glDeleteShader(shader);
+        gl::glDeleteProgram(program);
 
-        return -1;
+        exit(EXIT_FAILURE);
     }
 
-    return shader;
+    gl::glAttachShader(program, shader);
+    gl::glLinkProgram(program);
+
+    gl::glDetachShader(program, shader);
+    gl::glDeleteShader(shader);
+
+    return program;
 }
