@@ -7,6 +7,8 @@ struct vs_output {
 };
 
 layout (location = 0) out vs_output vert_output;
+layout (location = 1) out vec3 frag_pos;
+layout (location = 2) out vec3 view_out;
 
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
@@ -23,4 +25,7 @@ void main() {
     vert_output.position = position;
     vert_output.normal = normal;
     vert_output.uv = uv;
+
+    frag_pos = vec3(model * vec4(position, 1.0f));
+    view_out = vec3(frag_pos + view[3].xyz);
 }

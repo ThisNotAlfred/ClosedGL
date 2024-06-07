@@ -7,8 +7,9 @@ struct fs_input {
 };
 
 layout (location = 0) in fs_input frag_in;
+layout (location = 1) in vec3 frag_pos;
+layout (location = 2) in vec3 view_in;
 
-layout (location = 1) uniform mat4 view;
 layout (location = 3) uniform sampler2D tex_1;
 
 layout (location = 0) out vec4 color;
@@ -30,9 +31,7 @@ float V_SmithGGXCorrelated(float NoV, float NoL, float a) {
     return 0.5 / (GGXV + GGXL);
 }
 
-vec3 BRDF(vec3 l, mat4 view, vec3 n, vec3 diffuse_color , float perceptual_roughness, vec3 f0) {
-    vec3 v = -view[3].xyz;
-    
+vec3 BRDF(vec3 l,vec3 v, vec3 n, vec3 diffuse_color , float perceptual_roughness, vec3 f0) {
     vec3 h = normalize(v + l);
 
     float NoV = abs(dot(n, v)) + 1e-5;
@@ -58,13 +57,12 @@ vec3 BRDF(vec3 l, mat4 view, vec3 n, vec3 diffuse_color , float perceptual_rough
 }
 
 void main() {
-    vec3 out_color = vec3(0.5f, 0.5f, 0.5f);
-    vec3 directional_light = vec3(1.0f, 0.4f, 0.5f);
+    vec3 light_direction = normalize(frag_pos);
     float roughness = 0.4;
     
-    // vec3 frfd = BRDF(directional_light, view, frag_in.normal, out_color, roughness, vec3(0.3));
+    vec3 frfd = BRDF(light_direction, view_in, frag_in.normal, vec3(0.3f, 0.3f, 0.3f), roughness, vec3(0.78f, 0.71f, 0.77f));
 
-    out_color = vec3(texture(tex_1, frag_in.uv));
+    vec3 out_color = vec3(texture(tex_1, frag_in.uv)) * frfd;
 
     color = vec4(out_color, 1.0f);
 }
