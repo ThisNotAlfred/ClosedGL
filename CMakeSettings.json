@@ -1,0 +1,26 @@
+﻿{
+  "configurations": [
+    {
+      "name": "Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "inheritEnvironments": [ "cl.exe" ],
+      "buildRoot": "${projectDir}/build/${name}",
+      "installRoot": "${projectDir}/bin/${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": ""
+    },
+    {
+      "name": "Release",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "inheritEnvironments": [ "cl.exe" ],
+      "buildRoot": "${projectDir}/build/${name}",
+      "installRoot": "${projectDir}/bin/${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": ""
+    }
+  ]
+}
