@@ -20,6 +20,7 @@
 #include <glbinding-aux/types_to_string.h>
 
 // glm
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 
 // imgui

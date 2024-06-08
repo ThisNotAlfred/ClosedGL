@@ -1,4 +1,3 @@
-#define GLM_ENABLE_EXPERIMENTAL
 
 #include "closed_gl.hpp"
 
@@ -6,7 +5,6 @@
 #include "user_interface.hpp"
 
 #include <chrono>
-#include <format>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/euler_angles.hpp>
