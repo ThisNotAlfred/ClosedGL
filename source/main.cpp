@@ -91,7 +91,7 @@ main() -> int
     auto user_inter = UI(window);
 
     // TODO make this value not hard coded!
-    auto path = std::filesystem::path("../bin/demo_scene.glb");
+    auto path = std::filesystem::path("../bin/DragonAttenuation.glb");
     auto mesh = Mesh(path);
 
     if (!mesh.create_buffers()) {

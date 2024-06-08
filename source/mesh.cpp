@@ -152,7 +152,7 @@ Mesh::draw() const -> void
 {
     // TODO(StaticSaga): do not hardcode this
     int unit = 0;
-    gl::glBindTextureUnit(unit, this->textures[0]);
+    gl::glBindTextureUnit(unit, this->textures[1]);
     gl::glBindVertexArray(this->vertex_array);
     gl::glUniform1i(3, unit);
 

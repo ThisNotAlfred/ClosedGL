@@ -2,8 +2,8 @@
 
 #include "closed_gl.hpp"
 
-#include <fastgltf/tools.hpp>
 #include <fastgltf/core.hpp>
+#include <fastgltf/tools.hpp>
 #include <fastgltf/types.hpp>
 
 #include <filesystem>
@@ -25,8 +25,8 @@ class Mesh
     // TODO implementing other draw types .e.g instancing
     auto draw() const -> void;
     auto destroy() -> void;
-        private:
 
+        private:
     std::filesystem::path path;
 
     int indices_count;

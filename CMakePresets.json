@@ -18,28 +18,25 @@
         "CMAKE_C_STANDARD": "23",
 
         "BUILD_SHARED_LIBS": false,
-
+        
         "GLFW_LIBRARY_TYPE": "STATIC",
         "GLFW_BUILD_TESTS": false,
         "GLFW_BUILD_DOCS": false,
         "GLFW_INSTALL": false,
         "GLFW_BUILD_EXAMPLES": false,
-
+        
         "OPTION_SELF_CONTAINED": true,
         "OPTION_BUILD_TESTS": false,
         "OPTION_BUILD_DOCS": false,
         "OPTION_BUILD_TOOLS": false,
         "OPTION_BUILD_EXAMPLES": false,
         "OPTION_BUILD_OWN_KHR_HEADERS": true,
-
+        
         "GLM_ENABLE_CXX_20": true,
-
-        "FASTGLTF_COMPILE_AS_CPP20": true
-      },
-      "vendor": {
-        "microsoft.com/VisualStudioSettings/CMake/1.0": {
-          "enableClangTidyCodeAnalysis": true
-        }
+        
+        "FASTGLTF_COMPILE_AS_CPP20": true,
+        
+        "CMAKE_EXPORT_COMPILE_COMMANDS": true
       }
     },
     {
@@ -48,8 +45,8 @@
       "inherits": "base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_C_COMPILER": "clang-cl",
-        "CMAKE_CXX_COMPILER": "clang-cl"
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++"
       },
       "condition": {
         "type": "equals",
