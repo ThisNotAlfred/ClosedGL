@@ -38,4 +38,4 @@ class Mesh
     gl::GLuint vertex_buffer;
 };
 
-auto compile_program(std::filesystem::path& path, gl::GLenum shader_type) -> gl::GLuint;
+auto compile_shader(std::filesystem::path& path, gl::GLenum shader_type) -> gl::GLuint;

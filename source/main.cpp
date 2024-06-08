@@ -102,15 +102,43 @@ main() -> int
         std::println(stderr, "failed to load the mesh\n");
     }
 
+    auto program = gl::glCreateProgram();
+    gl::glProgramParameteri(program, gl::GL_PROGRAM_SEPARABLE, gl::GL_TRUE);
+
     // here shaders from `shaders/`
-    auto vert_path = std::filesystem::path("../shaders/vert.glsl");
-    auto vert      = compile_program(vert_path, gl::GL_VERTEX_SHADER);
+    auto vert_path = std::filesystem::path("../shaders/basic.vert");
+    auto vert      = compile_shader(vert_path, gl::GL_VERTEX_SHADER);
 
-    auto frag_path = std::filesystem::path("../shaders/frag.glsl");
-    auto frag      = compile_program(frag_path, gl::GL_FRAGMENT_SHADER);
+    auto frag_path = std::filesystem::path("../shaders/basic.frag");
+    auto frag      = compile_shader(frag_path, gl::GL_FRAGMENT_SHADER);
 
-    gl::GLuint program_pipline;
-    gl::glGenProgramPipelines(1, &program_pipline);
+    gl::glAttachShader(program, vert);
+    gl::glAttachShader(program, frag);
+
+    gl::glLinkProgram(program);
+
+    gl::GLboolean is_linked;
+    gl::glGetProgramiv(program, gl::GL_LINK_STATUS, &is_linked);
+    if (is_linked == gl::GL_FALSE) {
+        auto max_length = 1024;
+        gl::glGetProgramiv(program, gl::GL_INFO_LOG_LENGTH, &max_length);
+
+        std::vector<char> error_log(max_length);
+        gl::glGetProgramInfoLog(program, max_length, &max_length, &error_log[0]);
+
+        std::string_view error(error_log);
+        std::print(stderr, "{}", error);
+
+        gl::glDeleteProgram(program);
+
+        exit(EXIT_FAILURE);
+    }
+
+    gl::glDetachShader(program, vert);
+    gl::glDetachShader(program, frag);
+
+    gl::glDeleteShader(vert);
+    gl::glDeleteShader(frag);
 
     auto mat_proj  = glm::mat4(1);
     auto mat_view  = glm::mat4(1);
@@ -163,13 +191,11 @@ main() -> int
         mat_view = glm::lookAt(cam_pos, cam_pos + cam_front, cam_up);
         mat_proj = glm::perspective(glm::radians(30.0F), (float)g_width / (float)g_height, 0.1F, 100.0F);
 
-        gl::glUseProgramStages(program_pipline, gl::GL_VERTEX_SHADER_BIT, vert);
-        gl::glUseProgramStages(program_pipline, gl::GL_FRAGMENT_SHADER_BIT, frag);
-        gl::glBindProgramPipeline(program_pipline);
+        gl::glUseProgram(program);
 
-        gl::glUniformMatrix4fv(0, 1, false, glm::value_ptr(mat_proj));
-        gl::glUniformMatrix4fv(1, 1, false, glm::value_ptr(mat_view));
-        gl::glUniformMatrix4fv(2, 1, false, glm::value_ptr(mat_model));
+        gl::glProgramUniformMatrix4fv(program, 0, 1, false, glm::value_ptr(mat_proj));
+        gl::glProgramUniformMatrix4fv(program, 1, 1, false, glm::value_ptr(mat_view));
+        gl::glProgramUniformMatrix4fv(program, 2, 1, false, glm::value_ptr(mat_model));
 
         mesh.draw();
 

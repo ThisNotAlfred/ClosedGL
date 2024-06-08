@@ -21,36 +21,39 @@ Mesh::create_buffers() -> bool
     if (auto error = asset.error(); error != fastgltf::Error::None) {
         return false;
     }
-    
+
     for (auto& image : asset->images) {
         gl::GLuint texture;
         glCreateTextures(gl::GL_TEXTURE_2D, 1, &texture);
         std::visit(fastgltf::visitor {
-            [](auto& arg) {},
-            [&](fastgltf::sources::URI& filePath) {
-                // TODO:
-                assert(false);
-            },
-            [&](fastgltf::sources::Array& vector) {
-                assert(false);
-            },
-            [&](fastgltf::sources::BufferView& view) {
-                auto& buf_view = asset->bufferViews[view.bufferViewIndex];
-                auto& buffer = asset->buffers[buf_view.bufferIndex];
-                // TODO(StaticSaga): i took this code from an example, this is doing needless copying which should be avoided
-                std::visit(fastgltf::visitor {
-                    [](auto& arg) {},
-                    [&](fastgltf::sources::Array& array) {
-                        int width, height, channels;
-                        unsigned char* data = stbi_load_from_memory(array.bytes.data() + buf_view.byteOffset, (int)buf_view.byteLength, &width, &height, &channels, 4);
-                        int levels = 1 + (int)log2(std::max(width, height));
-                        glTextureStorage2D(texture, levels, gl::GL_RGBA8, width, height);
-                        glTextureSubImage2D(texture, 0, 0, 0, width, height, gl::GL_RGBA, gl::GL_UNSIGNED_BYTE, data);
-                        stbi_image_free(data);
-                    }
-                }, buffer.data);
-            },
-        }, image.data);
+                       [](auto& arg) {},
+                       [&](fastgltf::sources::URI& filePath) {
+                           // TODO:
+                           assert(false);
+                       },
+                       [&](fastgltf::sources::Array& vector) { assert(false); },
+                       [&](fastgltf::sources::BufferView& view) {
+                           auto& buf_view = asset->bufferViews[view.bufferViewIndex];
+                           auto& buffer   = asset->buffers[buf_view.bufferIndex];
+                           // TODO(StaticSaga): i took this code from an example, this is doing needless copying which
+                           // should be avoided
+                           std::visit(
+                               fastgltf::visitor { [](auto& arg) {},
+                                                   [&](fastgltf::sources::Array& array) {
+                                                       int width, height, channels;
+                                                       unsigned char* data = stbi_load_from_memory(
+                                                           array.bytes.data() + buf_view.byteOffset,
+                                                           (int)buf_view.byteLength, &width, &height, &channels, 4);
+                                                       int levels = 1 + (int)log2(std::max(width, height));
+                                                       glTextureStorage2D(texture, levels, gl::GL_RGBA8, width, height);
+                                                       glTextureSubImage2D(texture, 0, 0, 0, width, height, gl::GL_RGBA,
+                                                                           gl::GL_UNSIGNED_BYTE, data);
+                                                       stbi_image_free(data);
+                                                   } },
+                               buffer.data);
+                       },
+                   },
+                   image.data);
 
         gl::glGenerateTextureMipmap(texture);
         this->textures.push_back(texture);
@@ -76,17 +79,17 @@ Mesh::create_buffers() -> bool
             // vertices
             {
                 const auto* position_it = primitive.findAttribute("POSITION");
-                auto& position_accessor  = asset->accessors[position_it->second];
+                auto& position_accessor = asset->accessors[position_it->second];
 
                 const auto* normal_it = primitive.findAttribute("NORMAL");
-                auto& normal_accessor  = asset->accessors[position_it->second];
+                auto& normal_accessor = asset->accessors[position_it->second];
 
                 const auto* uv_it = primitive.findAttribute("TEXCOORD_0");
-                auto& uv_accessor  = asset->accessors[uv_it->second];
+                auto& uv_accessor = asset->accessors[uv_it->second];
 
                 assert(position_accessor.bufferViewIndex.has_value());
-                assert(normal_accessor.bufferViewIndex.has_value());                
-                assert(uv_accessor.bufferViewIndex.has_value());                
+                assert(normal_accessor.bufferViewIndex.has_value());
+                assert(uv_accessor.bufferViewIndex.has_value());
 
                 gl::glCreateBuffers(1, &this->vertex_buffer);
                 gl::glNamedBufferData(this->vertex_buffer, position_accessor.count * sizeof(Vertex), nullptr,
@@ -100,13 +103,11 @@ Mesh::create_buffers() -> bool
                     [&](const fastgltf::math::fvec3& pos, std::size_t idx) { vertices[idx].position = pos; });
 
                 fastgltf::iterateAccessorWithIndex<fastgltf::math::fvec3>(
-                    asset.get(), normal_accessor, [&](const fastgltf::math::fvec3& norm, std::size_t idx) {
-                        vertices[idx].normal = norm;
-                    });
+                    asset.get(), normal_accessor,
+                    [&](const fastgltf::math::fvec3& norm, std::size_t idx) { vertices[idx].normal = norm; });
                 fastgltf::iterateAccessorWithIndex<fastgltf::math::fvec2>(
-                    asset.get(), uv_accessor, [&](const fastgltf::math::fvec2& uv, std::size_t idx) {
-                        vertices[idx].uv = uv;
-                    });
+                    asset.get(), uv_accessor,
+                    [&](const fastgltf::math::fvec2& uv, std::size_t idx) { vertices[idx].uv = uv; });
 
                 gl::glUnmapNamedBuffer(this->vertex_buffer);
             }
@@ -156,24 +157,21 @@ Mesh::draw() const -> void
 }
 
 auto
-compile_program(std::filesystem::path& path, gl::GLenum shader_type) -> gl::GLuint
+compile_shader(std::filesystem::path& path, gl::GLenum shader_type) -> gl::GLuint
 {
     auto content                         = read_file_binary(path);
     std::array<char*, 1> shader_contents = { content.data() };
-
-    auto program = gl::glCreateProgram();
-    gl::glProgramParameteri(program, gl::GL_PROGRAM_SEPARABLE, gl::GL_TRUE);
+    std::array<int, 1> shader_size       = { content.size() };
 
     auto shader = gl::glCreateShader(shader_type);
-    gl::glShaderSource(shader, 1, shader_contents.data(), 0);
+    gl::glShaderSource(shader, 1, shader_contents.data(), shader_size.data());
+
     gl::glCompileShader(shader);
 
     gl::GLboolean is_compiled;
     gl::glGetShaderiv(shader, gl::GL_COMPILE_STATUS, &is_compiled);
     if (is_compiled == gl::GL_FALSE) {
-        std::print(stderr, "shader compilation failed due to:\n");
-        
-        gl::GLint max_length;
+        auto max_length = 1024;
         gl::glGetShaderiv(shader, gl::GL_INFO_LOG_LENGTH, &max_length);
 
         std::vector<char> error_log(max_length);
@@ -183,16 +181,9 @@ compile_program(std::filesystem::path& path, gl::GLenum shader_type) -> gl::GLui
         std::print(stderr, "{}", error);
 
         gl::glDeleteShader(shader);
-        gl::glDeleteProgram(program);
 
         exit(EXIT_FAILURE);
     }
 
-    gl::glAttachShader(program, shader);
-    gl::glLinkProgram(program);
-
-    gl::glDetachShader(program, shader);
-    gl::glDeleteShader(shader);
-
-    return program;
+    return shader;
 }
