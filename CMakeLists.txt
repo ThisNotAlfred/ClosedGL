@@ -157,13 +157,3 @@ target_link_libraries(
     imgui
     stb
 )
-
-# -----------------------------
-
-# outputting to the root directory `bin` directory
-set_target_properties( 
-    ClosedGl PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin"
-)
-
-install(TARGETS ClosedGl)
