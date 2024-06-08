@@ -15,6 +15,7 @@
       "installDir": "${sourceDir}/install/",
       "cacheVariables": {
         "BUILD_SHARED_LIBS": false,
+        
         "GLFW_LIBRARY_TYPE": "STATIC",
         "GLFW_BUILD_TESTS": false,
         "GLFW_BUILD_DOCS": false,
@@ -29,13 +30,6 @@
         "OPTION_BUILD_OWN_KHR_HEADERS": true,
         
         "GLM_ENABLE_CXX_20": true,
-        "GLM_ENABLE_SIMD_SSE2": true,
-        "GLM_ENABLE_SIMD_SSE3": true,
-        "GLM_ENABLE_SIMD_SSSE3": true,
-        "GLM_ENABLE_SIMD_SSE4_1": true,
-        "GLM_ENABLE_SIMD_SSE4_2": true,
-        "GLM_ENABLE_SIMD_AVX": true,
-        "GLM_ENABLE_SIMD_AVX2": true,
 
         "FASTGLTF_COMPILE_AS_CPP20": true        
       }
