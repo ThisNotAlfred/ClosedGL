@@ -60,22 +60,6 @@ FetchContent_MakeAvailable(glfw)
 
 # -----------------------------
 
-FetchContent_Declare(
-    stb
-    GIT_REPOSITORY https://github.com/nothings/stb
-    GIT_TAG        master
-    GIT_SHALLOW    TRUE
-    GIT_PROGRESS   TRUE
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND ""
-)
-FetchContent_MakeAvailable(stb)
-add_library(stb INTERFACE)
-target_include_directories(stb INTERFACE ${stb_SOURCE_DIR})
-
-
-# -----------------------------
-
 # glbinding
 set(OPTION_SELF_CONTAINED ON)
 set(OPTION_BUILD_TESTS OFF)
@@ -108,6 +92,25 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(glm)
+
+# -----------------------------
+
+#stb
+FetchContent_Declare(
+    stb
+    GIT_REPOSITORY https://github.com/nothings/stb
+    GIT_TAG        master
+    GIT_SHALLOW    TRUE
+    GIT_PROGRESS   TRUE
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+)
+
+FetchContent_MakeAvailable(stb)
+
+add_library(stb INTERFACE)
+
+target_include_directories(stb INTERFACE ${stb_SOURCE_DIR})
 
 # -----------------------------
 
