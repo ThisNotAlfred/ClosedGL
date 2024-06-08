@@ -10,7 +10,8 @@
 auto
 Mesh::create_buffers() -> bool
 {
-    fastgltf::Parser parser;
+    fastgltf::Parser parser(fastgltf::Extensions::KHR_materials_transmission |
+                            fastgltf::Extensions::KHR_materials_variants | fastgltf::Extensions::KHR_materials_volume);
 
     auto data = fastgltf::GltfDataBuffer::FromPath(this->path);
     if (data.error() != fastgltf::Error::None) {
@@ -151,7 +152,7 @@ Mesh::draw() const -> void
 {
     // TODO(StaticSaga): do not hardcode this
     int unit = 0;
-    gl::glBindTextureUnit(unit, this->textures[1]);
+    gl::glBindTextureUnit(unit, this->textures[0]);
     gl::glBindVertexArray(this->vertex_array);
     gl::glUniform1i(3, unit);
 

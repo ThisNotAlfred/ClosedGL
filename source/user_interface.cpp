@@ -18,15 +18,17 @@ UI::top_menu() -> void
         if (ImGui::BeginMenu("File")) {
             // TODO: bind these items to functions
 
-            if (ImGui::MenuItem("Open...", "CTRL+O")) {
+            if (ImGui::MenuItem("Open...", nullptr)) {
+
             }
 
-            if (ImGui::MenuItem("Export...", "CTRL+S")) {
+            if (ImGui::MenuItem("Export...", nullptr)) {
+                
             }
 
             ImGui::Separator();
 
-            if (ImGui::MenuItem("Exit", "CTRL+SHIFT+Q")) {
+            if (ImGui::MenuItem("Exit", nullptr)) {
                 glfwSetWindowShouldClose(this->window, 1);
             }
 
@@ -34,7 +36,7 @@ UI::top_menu() -> void
         }
 
         if (ImGui::BeginMenu("Tools")) {
-            ImGui::MenuItem("Toolbox", "CTRL+T", &this->show_toolset);
+            ImGui::MenuItem("Toolbox", nullptr, &this->show_toolset);
             ImGui::EndMenu();
         }
 

@@ -60,7 +60,6 @@ main() -> int
 
     glfwSetKeyCallback(window, key_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPos(window, g_width / 2.0F, g_height / 2.0F);
 
     glfwMakeContextCurrent(window);
@@ -92,7 +91,7 @@ main() -> int
     auto user_inter = UI(window);
 
     // TODO make this value not hard coded!
-    auto path = std::filesystem::path("../bin/DragonAttenuation.glb");
+    auto path = std::filesystem::path("../bin/demo_scene.glb");
     auto mesh = Mesh(path);
 
     if (!mesh.create_buffers()) {
