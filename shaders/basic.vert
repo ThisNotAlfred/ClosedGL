@@ -10,9 +10,9 @@ layout( location = 2 ) out vec2 uv_out;
 layout( location = 3 ) out vec3 frag_pos;
 layout( location = 4 ) out vec3 view_out;
 
-layout( location = 5 ) in vec3 position_in;
-layout( location = 6 ) in vec3 normal_in;
-layout( location = 7 ) in vec2 uv_in;
+layout( location = 0 ) in vec3 position_in;
+layout( location = 1 ) in vec3 normal_in;
+layout( location = 2 ) in vec2 uv_in;
 
 layout( location = 0 ) uniform mat4 projection;
 layout( location = 1 ) uniform mat4 view;
