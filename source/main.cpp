@@ -95,7 +95,7 @@ main() -> int
     auto user_inter = UI(window);
 
     // TODO make this value not hard coded!
-    auto path = std::filesystem::path("DragonAttenuation.glb");
+    auto path = std::filesystem::path("../bin/DragonAttenuation.glb");
     auto mesh = Mesh(path);
 
     if (!mesh.create_buffers()) {
@@ -115,7 +115,7 @@ main() -> int
     gl::glAttachShader(program, vert);
     gl::glAttachShader(program, frag);
 
-    gl::glBindFragDataLocation(program, 0, "color_output"); 
+    gl::glBindFragDataLocation(program, 0, "color_output");
 
     gl::glLinkProgram(program);
 
@@ -126,7 +126,7 @@ main() -> int
         gl::glGetProgramiv(program, gl::GL_INFO_LOG_LENGTH, &max_length);
 
         std::vector<char> error_log(max_length);
-        gl::glGetProgramInfoLog(program, max_length, &max_length, &error_log[0]);
+        gl::glGetProgramInfoLog(program, max_length, &max_length, error_log.data());
 
         std::string_view error(error_log);
         std::print(stderr, "{}", error);
@@ -153,7 +153,7 @@ main() -> int
     float cam_speed_pitch = 1;
 
     // main loop
-    float dt = 0;
+    float delta_time = 0;
     while (glfwWindowShouldClose(window) == 0) {
         // setting `loop_start` to calculate `dt` later
         auto loop_start = std::chrono::high_resolution_clock::now();
@@ -167,7 +167,8 @@ main() -> int
 
         glfwPollEvents();
 
-        double mousex, mousey;
+        double mousex;
+        double mousey;
         glfwGetCursorPos(window, &mousex, &mousey);
 
         auto xoff = (float)mousex / ((float)g_width / 2) - 1.0;
@@ -175,20 +176,27 @@ main() -> int
 
         auto yaw       = -xoff * cam_speed_yaw * std::numbers::pi - std::numbers::pi;
         auto pitch     = yoff * cam_speed_pitch * std::numbers::pi;
-        auto mat_rot   = glm::eulerAngleYXZ<float>(yaw, pitch, 0.0f);
+        auto mat_rot   = glm::eulerAngleYXZ<float>(yaw, pitch, 0.0F);
         auto cam_front = glm::vec3(mat_rot[2]);
         auto cam_up    = glm::vec3(mat_rot[1]);
 
         glm::vec3 cam_right = glm::normalize(glm::cross(cam_front, cam_up));
 
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-            cam_pos += dt * cam_speed_zoom * cam_front;
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-            cam_pos -= dt * cam_speed_zoom * cam_front;
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-            cam_pos -= dt * cam_speed_zoom * cam_right;
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-            cam_pos += dt * cam_speed_zoom * cam_right;
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+            cam_pos += delta_time * cam_speed_zoom * cam_front;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+            cam_pos -= delta_time * cam_speed_zoom * cam_front;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+            cam_pos -= delta_time * cam_speed_zoom * cam_right;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+            cam_pos += delta_time * cam_speed_zoom * cam_right;
+        }
 
         mat_view = glm::lookAt(cam_pos, cam_pos + cam_front, cam_up);
         mat_proj = glm::perspective(glm::radians(30.0F), (float)g_width / (float)g_height, 0.1F, 100.0F);
@@ -218,10 +226,10 @@ main() -> int
         // setting `time_point` and calculating `dt`
         auto loop_end                     = std::chrono::high_resolution_clock::now();
         std::chrono::duration<float> time = loop_end - loop_start;
-        dt                                = time.count();
+        delta_time                        = time.count();
 
 #ifdef _DEBUG
-        glfwSetWindowTitle(window, std::format("ClosedGL {}fps", static_cast<int>(1.0F / dt)).c_str());
+        glfwSetWindowTitle(window, std::format("ClosedGL {}fps", static_cast<int>(1.0F / delta_time)).c_str());
 #endif
     }
 

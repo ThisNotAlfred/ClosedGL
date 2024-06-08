@@ -40,7 +40,9 @@ Mesh::create_buffers() -> bool
                            std::visit(
                                fastgltf::visitor { [](auto& arg) {},
                                                    [&](fastgltf::sources::Array& array) {
-                                                       int width, height, channels;
+                                                       int width;
+                                                       int height;
+                                                       int channels;
                                                        unsigned char* data = stbi_load_from_memory(
                                                            array.bytes.data() + buf_view.byteOffset,
                                                            (int)buf_view.byteLength, &width, &height, &channels, 4);
@@ -175,7 +177,7 @@ compile_shader(std::filesystem::path& path, gl::GLenum shader_type) -> gl::GLuin
         gl::glGetShaderiv(shader, gl::GL_INFO_LOG_LENGTH, &max_length);
 
         std::vector<char> error_log(max_length);
-        gl::glGetShaderInfoLog(shader, max_length, &max_length, &error_log[0]);
+        gl::glGetShaderInfoLog(shader, max_length, &max_length, error_log.data());
 
         std::string_view error(error_log);
         std::print(stderr, "{}", error);
