@@ -12,23 +12,56 @@
       "displayName": "Base",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/",
-      "installDir": "${sourceDir}/install/"
+      "installDir": "${sourceDir}/install/",
+      "cacheVariables": {
+        "BUILD_SHARED_LIBS": false,
+        "GLFW_LIBRARY_TYPE": "STATIC",
+        "GLFW_BUILD_TESTS": false,
+        "GLFW_BUILD_DOCS": false,
+        "GLFW_INSTALL": false,
+        "GLFW_BUILD_EXAMPLES": false,
+        
+        "OPTION_SELF_CONTAINED": true,
+        "OPTION_BUILD_TESTS": false,
+        "OPTION_BUILD_DOCS": false,
+        "OPTION_BUILD_TOOLS": false,
+        "OPTION_BUILD_EXAMPLES": false,
+        "OPTION_BUILD_OWN_KHR_HEADERS": true,
+        
+        "GLM_ENABLE_CXX_20": true,
+        "GLM_ENABLE_SIMD_SSE2": true,
+        "GLM_ENABLE_SIMD_SSE3": true,
+        "GLM_ENABLE_SIMD_SSSE3": true,
+        "GLM_ENABLE_SIMD_SSE4_1": true,
+        "GLM_ENABLE_SIMD_SSE4_2": true,
+        "GLM_ENABLE_SIMD_AVX": true,
+        "GLM_ENABLE_SIMD_AVX2": true,
+
+        "FASTGLTF_COMPILE_AS_CPP20": true        
+      }
     },
     {
       "name": "x64-debug",
       "displayName": "Debug",
       "inherits": "base",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-      },
-      "environment": {
-        "CMAKE_C_COMPILER": "clang.exe",
-        "CMAKE_CXX_COMPILER": "clang++.exe"
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_COMPILER": "clang-cl",
+        "CMAKE_CXX_COMPILER": "clang-cl",
+        "CMAKE_CXX_STANDARD": "23",
+        "CMAKE_C_STANDARD": "23"
       },
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",
         "rhs": "Windows"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": "Windows",
+          "intelliSenseMode": "windows-clang-x64",
+          "enableClangTidyCodeAnalysis": true
+        }
       }
     },
     {
@@ -49,15 +82,22 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-      },
-      "environment": {
         "CMAKE_C_COMPILER": "clang",
-        "CMAKE_CXX_COMPILER": "clang++"
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_CXX_STANDARD": "23",
+        "CMAKE_C_STANDARD": "23"
       },
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",
         "rhs": "Linux"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": "Linux",
+          "intelliSenseMode": "linux-gcc-x64",
+          "enableClangTidyCodeAnalysis": true
+        }
       }
     },
     {
@@ -87,14 +127,18 @@
       "displayName": "Verbose Build",
       "description": "Passes -v to Ninja",
       "configurePreset": "linux-debug",
-      "nativeToolOptions": [ "-v" ]
+      "nativeToolOptions": [
+        "-v"
+      ]
     },
     {
       "name": "verbose-build-windows",
       "displayName": "Verbose Build",
       "description": "Passes -v to Ninja",
       "configurePreset": "x64-debug",
-      "nativeToolOptions": [ "-v" ]
+      "nativeToolOptions": [
+        "-v"
+      ]
     }
   ]
 }

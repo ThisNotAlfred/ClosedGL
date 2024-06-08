@@ -1,13 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
 project(ClosedGl CXX)
 
-# c++23 and c23
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_C_STANDARD 23)
-
-# forcing everyting to be static
-set(BUILD_SHARED_LIBS OFF)
-
 # -----------------------------
 
 # ClosedGl
@@ -42,12 +35,6 @@ include(FetchContent)
 # -----------------------------
 
 # glfw
-set(GLFW_LIBRARY_TYPE STATIC)
-set(GLFW_BUILD_TESTS OFF)
-set(GLFW_BUILD_DOCS OFF)
-set(GLFW_INSTALL OFF)
-set(GLFW_BUILD_EXAMPLES OFF)
-
 FetchContent_Declare(
     glfw
     GIT_REPOSITORY https://github.com/glfw/glfw
@@ -61,13 +48,6 @@ FetchContent_MakeAvailable(glfw)
 # -----------------------------
 
 # glbinding
-set(OPTION_SELF_CONTAINED ON)
-set(OPTION_BUILD_TESTS OFF)
-set(OPTION_BUILD_DOCS OFF)
-set(OPTION_BUILD_TOOLS OFF)
-set(OPTION_BUILD_EXAMPLES OFF)
-set(OPTION_BUILD_OWN_KHR_HEADERS ON)
-
 FetchContent_Declare(
     glbinding
     GIT_REPOSITORY https://github.com/cginternals/glbinding

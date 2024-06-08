@@ -72,7 +72,7 @@ main() -> int
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
-    auto imgui_io = ImGui::GetIO();
+    auto& imgui_io = ImGui::GetIO();
     static_cast<void>(imgui_io);
 
     // enabling keyboard in imgui
