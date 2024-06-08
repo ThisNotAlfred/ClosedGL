@@ -115,6 +115,8 @@ main() -> int
     gl::glAttachShader(program, vert);
     gl::glAttachShader(program, frag);
 
+    gl::glBindFragDataLocation(program, 0, "color_output"); 
+
     gl::glLinkProgram(program);
 
     gl::GLboolean is_linked;

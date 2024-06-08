@@ -161,7 +161,7 @@ compile_shader(std::filesystem::path& path, gl::GLenum shader_type) -> gl::GLuin
 {
     auto content                         = read_file_binary(path);
     std::array<char*, 1> shader_contents = { content.data() };
-    std::array<int, 1> shader_size       = { content.size() };
+    std::array<int, 1> shader_size       = { static_cast<int>(content.size()) };
 
     auto shader = gl::glCreateShader(shader_type);
     gl::glShaderSource(shader, 1, shader_contents.data(), shader_size.data());
