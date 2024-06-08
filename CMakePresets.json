@@ -14,24 +14,32 @@
       "binaryDir": "${sourceDir}/build/",
       "installDir": "${sourceDir}/install/",
       "cacheVariables": {
+        "CMAKE_CXX_STANDARD": "23",
+        "CMAKE_C_STANDARD": "23",
+
         "BUILD_SHARED_LIBS": false,
-        
+
         "GLFW_LIBRARY_TYPE": "STATIC",
         "GLFW_BUILD_TESTS": false,
         "GLFW_BUILD_DOCS": false,
         "GLFW_INSTALL": false,
         "GLFW_BUILD_EXAMPLES": false,
-        
+
         "OPTION_SELF_CONTAINED": true,
         "OPTION_BUILD_TESTS": false,
         "OPTION_BUILD_DOCS": false,
         "OPTION_BUILD_TOOLS": false,
         "OPTION_BUILD_EXAMPLES": false,
         "OPTION_BUILD_OWN_KHR_HEADERS": true,
-        
+
         "GLM_ENABLE_CXX_20": true,
 
-        "FASTGLTF_COMPILE_AS_CPP20": true        
+        "FASTGLTF_COMPILE_AS_CPP20": true
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "enableClangTidyCodeAnalysis": true
+        }
       }
     },
     {
@@ -41,21 +49,12 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_C_COMPILER": "clang-cl",
-        "CMAKE_CXX_COMPILER": "clang-cl",
-        "CMAKE_CXX_STANDARD": "23",
-        "CMAKE_C_STANDARD": "23"
+        "CMAKE_CXX_COMPILER": "clang-cl"
       },
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",
         "rhs": "Windows"
-      },
-      "vendor": {
-        "microsoft.com/VisualStudioSettings/CMake/1.0": {
-          "hostOS": "Windows",
-          "intelliSenseMode": "windows-clang-x64",
-          "enableClangTidyCodeAnalysis": true
-        }
       }
     },
     {
@@ -77,21 +76,12 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_C_COMPILER": "clang",
-        "CMAKE_CXX_COMPILER": "clang++",
-        "CMAKE_CXX_STANDARD": "23",
-        "CMAKE_C_STANDARD": "23"
+        "CMAKE_CXX_COMPILER": "clang++"
       },
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",
         "rhs": "Linux"
-      },
-      "vendor": {
-        "microsoft.com/VisualStudioSettings/CMake/1.0": {
-          "hostOS": "Linux",
-          "intelliSenseMode": "linux-gcc-x64",
-          "enableClangTidyCodeAnalysis": true
-        }
       }
     },
     {
