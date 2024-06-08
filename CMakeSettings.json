@@ -9,7 +9,59 @@
       "installRoot": "${projectDir}/bin/${name}",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
-      "ctestCommandArgs": ""
+      "ctestCommandArgs": "",
+      "variables": [
+        {
+          "name": "FASTGLTF_COMPILE_AS_CPP20",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "FASTGLTF_ENABLE_CPP_MODULES",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "GLM_ENABLE_SIMD_SSSE3",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "GLM_ENABLE_SIMD_SSE4_2",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "GLM_ENABLE_SIMD_SSE4_1",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "GLM_ENABLE_SIMD_SSE3",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "GLM_ENABLE_SIMD_AVX",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "GLM_ENABLE_SIMD_AVX2",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "GLM_ENABLE_SIMD_SSE2",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "GLM_ENABLE_CXX_20",
+          "value": "True",
+          "type": "BOOL"
+        }
+      ]
     },
     {
       "name": "Release",
@@ -20,7 +72,59 @@
       "installRoot": "${projectDir}/bin/${name}",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
-      "ctestCommandArgs": ""
+      "ctestCommandArgs": "",
+      "variables": [
+        {
+          "name": "GLM_ENABLE_SIMD_SSSE3",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "FASTGLTF_ENABLE_CPP_MODULES",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "FASTGLTF_COMPILE_AS_CPP20",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "GLM_ENABLE_CXX_20",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "GLM_ENABLE_SIMD_AVX",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "GLM_ENABLE_SIMD_AVX2",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "GLM_ENABLE_SIMD_SSE2",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "GLM_ENABLE_SIMD_SSE3",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "GLM_ENABLE_SIMD_SSE4_1",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "GLM_ENABLE_SIMD_SSE4_2",
+          "value": "True",
+          "type": "BOOL"
+        }
+      ]
     }
   ]
 }
