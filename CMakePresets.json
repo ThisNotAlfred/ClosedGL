@@ -1,0 +1,100 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "displayName": "Base",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/",
+      "installDir": "${sourceDir}/install/"
+    },
+    {
+      "name": "x64-debug",
+      "displayName": "Debug",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      },
+      "environment": {
+        "CMAKE_C_COMPILER": "clang.exe",
+        "CMAKE_CXX_COMPILER": "clang++.exe"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "x64-release",
+      "inherits": "x64-debug",
+      "displayName": "Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "linux-debug",
+      "displayName": "Debug",
+      "inherits": "base",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+      },
+      "environment": {
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "linux-release",
+      "displayName": "Release",
+      "inherits": "linux-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "default-build-linux",
+      "displayName": "Default",
+      "configurePreset": "linux-debug",
+      "description": "Vanilla build"
+    },
+    {
+      "name": "default-build-windows",
+      "displayName": "Default",
+      "configurePreset": "x64-debug",
+      "description": "Vanilla build"
+    },
+    {
+      "name": "verbose-build-linux",
+      "displayName": "Verbose Build",
+      "description": "Passes -v to Ninja",
+      "configurePreset": "linux-debug",
+      "nativeToolOptions": [ "-v" ]
+    },
+    {
+      "name": "verbose-build-windows",
+      "displayName": "Verbose Build",
+      "description": "Passes -v to Ninja",
+      "configurePreset": "x64-debug",
+      "nativeToolOptions": [ "-v" ]
+    }
+  ]
+}
