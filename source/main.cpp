@@ -20,7 +20,6 @@ error(int errnum, const char* errmsg)
     std::cerr << errnum << ": " << errmsg << '\n';
 }
 
-
 auto
 framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -62,7 +61,7 @@ main() -> int
     glfwSetKeyCallback(window, key_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glfwSetCursorPos(window, g_width / 2, g_height / 2);
+    glfwSetCursorPos(window, g_width / 2.0F, g_height / 2.0F);
 
     glfwMakeContextCurrent(window);
 
