@@ -1,38 +1,24 @@
-
 #include "closed_gl.hpp"
 
+#include "input.hpp"
 #include "mesh.hpp"
+#include "tools.hpp"
 #include "user_interface.hpp"
 
 #include <chrono>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/euler_angles.hpp>
-#include <iostream>
 #include <numbers>
 #include <print>
 
 static int g_width = 1600, g_height = 900;
 
 auto
-error(int errnum, const char* errmsg)
-{
-    std::cerr << errnum << ": " << errmsg << '\n';
-}
-
-auto
 framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     g_width  = width;
     g_height = height;
-}
-
-auto
-key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, 1);
-    }
 }
 
 auto
@@ -84,9 +70,9 @@ main() -> int
     glbinding::initialize(glfwGetProcAddress, false);
     glbinding::aux::enableGetErrorCallback();
 
-    std::cout << "OpenGL Version:  " << glbinding::aux::ContextInfo::version() << '\n'
-              << "OpenGL Vendor:   " << glbinding::aux::ContextInfo::vendor() << '\n'
-              << "OpenGL Renderer: " << glbinding::aux::ContextInfo::renderer() << '\n';
+    std::println(stderr, "OPENGL VERSION: {}\nOPENGL VENDOR: {}\nOPENGL RENDERER: {}",
+                 glbinding::aux::ContextInfo::version().toString(), glbinding::aux::ContextInfo::vendor(),
+                 glbinding::aux::ContextInfo::renderer());
 
     auto user_inter = UI(window);
 
