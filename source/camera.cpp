@@ -18,7 +18,7 @@ Camera::transform() -> void
     auto quaternion      = glm::quat(glm::vec3(this->pitch, this->yaw, 0));
     auto movement_vector = glm::vec3(this->right_and_left, this->up_and_down, this->forward_and_back);
 
-
+    // TODO: use local axes instead of tranforming global ones
     this->up     = glm::rotate(quaternion, world_up);
     this->target = glm::normalize(glm::rotate(quaternion, world_forward));
 
