@@ -1,7 +1,6 @@
 #include "closed_gl.hpp"
 
 #include "engine.hpp"
-#include "input.hpp"
 #include "mesh.hpp"
 #include "tools.hpp"
 
@@ -67,14 +66,13 @@ main() -> int
 
     // engine starts here
     auto engine = Engine(window);
-    auto input  = Input(window, engine);
 
     // initializing engine
     engine.init();
 
     // core
     while (glfwWindowShouldClose(window) == 0) {
-        input.check_for_input();
+        engine.check_for_input();
         engine.frame();
     }
 

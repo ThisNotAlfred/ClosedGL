@@ -71,35 +71,106 @@ Engine::init() -> void
 auto
 Engine::frame() -> void
 {
-        auto loop_start = std::chrono::high_resolution_clock::now();
+    auto loop_start = std::chrono::high_resolution_clock::now();
 
-        // updating camera
-        camera.transform();
+    // updating camera
+    camera.transform();
 
-        // clearing last frame
-        gl::glClearColor(0, 0, 0, 1);
-        gl::glClearDepth(1);
-        gl::glEnable(gl::GL_DEPTH_TEST);
-        gl::glDepthFunc(gl::GL_LEQUAL);
-        gl::glClear(gl::GL_COLOR_BUFFER_BIT | gl::GL_DEPTH_BUFFER_BIT);
+    // clearing last frame
+    gl::glClearColor(0, 0, 0, 1);
+    gl::glClearDepth(1);
+    gl::glEnable(gl::GL_DEPTH_TEST);
+    gl::glDepthFunc(gl::GL_LEQUAL);
+    gl::glClear(gl::GL_COLOR_BUFFER_BIT | gl::GL_DEPTH_BUFFER_BIT);
 
-        gl::glUseProgram(this->shaders[0]);
-        this->meshes[0].draw();
+    gl::glUseProgram(this->shaders[0]);
+    this->meshes[0].draw();
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-        this->user_interface.draw();
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+    this->user_interface.draw();
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-        glfwSwapBuffers(this->window);
+    glfwSwapBuffers(this->window);
 
-        auto loop_end                     = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<float> time = loop_end - loop_start;
-        delta_time                        = time.count();
+    auto loop_end                     = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<float> time = loop_end - loop_start;
+    delta_time                        = time.count();
 
 #ifdef _DEBUG
-        glfwSetWindowTitle(window, std::format("ClosedGL {}fps", static_cast<int>(1.0F / delta_time)).c_str());
+    glfwSetWindowTitle(window, std::format("ClosedGL {}fps", static_cast<int>(1.0F / delta_time)).c_str());
 #endif
+}
+
+auto
+Engine::check_for_input() -> void
+{
+    glfwPollEvents();
+
+    // handling left shift
+    if (glfwGetKey(this->window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS) {
+        this->is_left_alt_down = true;
+    }
+
+    if (glfwGetKey(this->window, GLFW_KEY_LEFT_ALT) == GLFW_RELEASE) {
+        this->is_left_alt_down = false;
+    }
+
+    // handling left ctrl
+    if (glfwGetKey(this->window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+        this->is_left_ctrl_down = true;
+    }
+
+    if (glfwGetKey(this->window, GLFW_KEY_LEFT_CONTROL) == GLFW_RELEASE) {
+        this->is_left_ctrl_down = false;
+    }
+
+    // handling left shift
+    if (glfwGetKey(this->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+        this->is_left_shift_down = true;
+    }
+
+    if (glfwGetKey(this->window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE) {
+        this->is_left_shift_down = false;
+    }
+
+    // check for escape and quit if pressed escape
+    // TODO make a proper application that takes an existing status
+    if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        // this->engine.quit();
+        glfwSetWindowShouldClose(this->window, 1);
+    }
+
+    // camera input
+    if (is_left_shift_down) {
+        if (glfwGetKey(this->window, GLFW_KEY_W) == 0) {
+            this->camera.go_forward(this->delta_time);
+        }
+
+        if (glfwGetKey(this->window, GLFW_KEY_S) == 0) {
+            this->camera.go_back(this->delta_time);
+        }
+
+        if (glfwGetKey(this->window, GLFW_KEY_D) == 0) {
+            this->camera.go_right(this->delta_time);
+        }
+
+        if (glfwGetKey(this->window, GLFW_KEY_A) == 0) {
+            this->camera.go_left(this->delta_time);
+        }
+
+        if (glfwGetKey(this->window, GLFW_KEY_SPACE) == 0) {
+            this->camera.go_up(this->delta_time);
+        }
+
+        // mouse rotation
+        {
+            double mouse_x;
+            double mouse_y;
+            glfwGetCursorPos(this->window, &mouse_x, &mouse_y);
+            camera.rotate(static_cast<float>(mouse_x), static_cast<float>(mouse_y));
+        }
+    }
 }

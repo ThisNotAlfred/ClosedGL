@@ -16,6 +16,8 @@ class Engine
     auto init() -> void;
     auto frame() -> void;
 
+    auto check_for_input() -> void;
+
         private:
     GLFWwindow* window;
     int width;
@@ -29,4 +31,9 @@ class Engine
 
     // environment booleans
     float delta_time = 0.0F;
+
+    // input variables
+    bool is_left_alt_down   = false;
+    bool is_left_ctrl_down  = false;
+    bool is_left_shift_down = false;
 };
