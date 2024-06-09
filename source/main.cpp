@@ -1,21 +1,16 @@
 #include "closed_gl.hpp"
 
+#include "engine.hpp"
 #include "input.hpp"
 #include "mesh.hpp"
 #include "tools.hpp"
-#include "user_interface.hpp"
 
 #include <chrono>
+#include <filesystem>
 #include <print>
+#include <thread>
 
 static int g_width = 1600, g_height = 900;
-
-auto
-framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    g_width  = width;
-    g_height = height;
-}
 
 auto
 main() -> int
@@ -26,10 +21,14 @@ main() -> int
         return 1;
     }
 
-    // setting the opengl version to 4.6
+    // setting the opengl version to 4.6 core
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    // making window unresizeable
+    // TODO make window ressizeable again
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
     auto* window = glfwCreateWindow(g_width, g_height, "ClosedGL", nullptr, nullptr);
     if (window == nullptr) {
@@ -39,10 +38,6 @@ main() -> int
         glfwTerminate();
         return -1;
     }
-
-    auto input = Input(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetCursorPos(window, g_width / 2.0F, g_height / 2.0F);
 
     glfwMakeContextCurrent(window);
 
@@ -70,58 +65,24 @@ main() -> int
                  glbinding::aux::ContextInfo::version().toString(), glbinding::aux::ContextInfo::vendor(),
                  glbinding::aux::ContextInfo::renderer());
 
-    auto user_inter = UI(window);
+    // engine starts here
+    auto engine = Engine(window);
+    auto input  = Input(window, engine);
 
-    // TODO make this value not hard coded!
-    auto path = std::filesystem::path("../bin/DragonAttenuation.glb");
-    auto mesh = Mesh(path);
+    // initializing engine
+    engine.init();
 
-    if (!mesh.create_buffers()) {
-        std::println(stderr, "failed to load the mesh\n");
-    }
+    // core
+    std::thread engine_thread(&Engine::frame, &engine);
+    std::thread input_thread(&Input::check_for_input, &input);
 
-    auto program = gl::glCreateProgram();
-    gl::glProgramParameteri(program, gl::GL_PROGRAM_SEPARABLE, gl::GL_TRUE);
-
-    auto vert_path = std::filesystem::path("../shaders/basic.vert");
-    auto vert      = compile_shader(vert_path, gl::GL_VERTEX_SHADER);
-
-    auto frag_path = std::filesystem::path("../shaders/basic.frag");
-    auto frag      = compile_shader(frag_path, gl::GL_FRAGMENT_SHADER);
-
-    gl::glAttachShader(program, vert);
-    gl::glAttachShader(program, frag);
-
-    gl::glBindFragDataLocation(program, 0, "color_output");
-
-    gl::glLinkProgram(program);
-
-    gl::GLboolean is_linked;
-    gl::glGetProgramiv(program, gl::GL_LINK_STATUS, &is_linked);
-    if (is_linked == gl::GL_FALSE) {
-        auto max_length = 1024;
-        gl::glGetProgramiv(program, gl::GL_INFO_LOG_LENGTH, &max_length);
-
-        std::vector<char> error_log(max_length);
-        gl::glGetProgramInfoLog(program, max_length, &max_length, error_log.data());
-
-        std::string_view error(error_log);
-        std::print(stderr, "{}", error);
-
-        gl::glDeleteProgram(program);
-
-        exit(EXIT_FAILURE);
-    }
-
-    gl::glDetachShader(program, vert);
-    gl::glDetachShader(program, frag);
-
-    gl::glDeleteShader(vert);
-    gl::glDeleteShader(frag);
+    engine_thread.join();
+    input_thread.join();
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
 
+    glfwDestroyWindow(window);
     glfwTerminate();
 
     return 0;

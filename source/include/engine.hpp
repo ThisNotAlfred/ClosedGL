@@ -3,6 +3,7 @@
 #include "closed_gl.hpp"
 
 #include "camera.hpp"
+#include "mesh.hpp"
 #include "tools.hpp"
 #include "user_interface.hpp"
 
@@ -12,7 +13,10 @@ class Engine
     Engine(GLFWwindow* window);
     ~Engine() = default;
 
+    auto init() -> void;
     auto frame() -> void;
+
+    auto quit() -> void; 
 
         private:
     GLFWwindow* window;
@@ -21,8 +25,11 @@ class Engine
 
     UI user_interface;
     Camera camera;
+    // TODO use a better structur rather than a simple vector for handling mehses and shaders
+    std::vector<Mesh> meshes;
+    std::vector<gl::GLuint> shaders;
 
     // environment booleans
-    bool run = true;
+    bool running = true;
     float delta_time = 0.0F;
 };
