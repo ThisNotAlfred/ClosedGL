@@ -123,22 +123,13 @@ main() -> int
     gl::glDeleteShader(vert);
     gl::glDeleteShader(frag);
 
-    auto mat_proj  = glm::mat4(1);
-    auto mat_view  = glm::mat4(1);
-    auto mat_model = glm::mat4(1);
-
-    glm::vec3 cam_pos     = glm::vec3(0.0F, 0.0F, 10.0F);
-    glm::vec3 cam_up      = glm::vec3(0.0F, 1.0F, 0.0F);
-    float cam_speed_zoom  = 10;
-    float cam_speed_yaw   = 1;
-    float cam_speed_pitch = 1;
-
     // main loop
     float delta_time = 0;
     while (glfwWindowShouldClose(window) == 0) {
         auto loop_start = std::chrono::high_resolution_clock::now();
 
         // TODO this should be in its own thread.
+        glfwPollEvents();
         input.check_for_input();
 
         gl::glClearColor(0, 0, 0, 1);
@@ -146,48 +137,6 @@ main() -> int
         gl::glEnable(gl::GL_DEPTH_TEST);
         gl::glDepthFunc(gl::GL_LEQUAL);
         gl::glClear(gl::GL_COLOR_BUFFER_BIT | gl::GL_DEPTH_BUFFER_BIT);
-
-        glfwPollEvents();
-
-        double mousex;
-        double mousey;
-        glfwGetCursorPos(window, &mousex, &mousey);
-
-        auto xoff = (float)mousex / ((float)g_width / 2) - 1.0;
-        auto yoff = (float)mousey / ((float)g_height / 2) - 1.0;
-
-        auto yaw       = -xoff * cam_speed_yaw * std::numbers::pi - std::numbers::pi;
-        auto pitch     = yoff * cam_speed_pitch * std::numbers::pi;
-        auto mat_rot   = glm::eulerAngleYXZ<float>(yaw, pitch, 0.0F);
-        auto cam_front = glm::vec3(mat_rot[2]);
-        auto cam_up    = glm::vec3(mat_rot[1]);
-
-        glm::vec3 cam_right = glm::normalize(glm::cross(cam_front, cam_up));
-
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-            cam_pos += delta_time * cam_speed_zoom * cam_front;
-        }
-
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-            cam_pos -= delta_time * cam_speed_zoom * cam_front;
-        }
-
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-            cam_pos -= delta_time * cam_speed_zoom * cam_right;
-        }
-
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-            cam_pos += delta_time * cam_speed_zoom * cam_right;
-        }
-
-        mat_view = glm::lookAt(cam_pos, cam_pos + cam_front, cam_up);
-        mat_proj = glm::perspective(glm::radians(30.0F), (float)g_width / (float)g_height, 0.1F, 100.0F);
-
-        gl::glUseProgram(program);
-
-        gl::glProgramUniformMatrix4fv(program, 0, 1, false, glm::value_ptr(mat_proj));
-        gl::glProgramUniformMatrix4fv(program, 1, 1, false, glm::value_ptr(mat_view));
-        gl::glProgramUniformMatrix4fv(program, 2, 1, false, glm::value_ptr(mat_model));
 
         mesh.draw();
 
@@ -201,7 +150,6 @@ main() -> int
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
-
 
         auto loop_end                     = std::chrono::high_resolution_clock::now();
         std::chrono::duration<float> time = loop_end - loop_start;
