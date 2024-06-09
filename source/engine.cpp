@@ -11,7 +11,7 @@ Engine::Engine(GLFWwindow* window)
 
     // initilizing default values
     this->user_interface = UI(window);
-    this->camera         = Camera(10, 3, 0.3F);
+    this->camera         = Camera(10, 3, 0.03F);
 }
 
 auto
@@ -153,23 +153,23 @@ Engine::check_for_input() -> void
 
     // camera input
     if (is_left_shift_down) {
-        if (glfwGetKey(this->window, GLFW_KEY_W) == 0) {
+        if (glfwGetKey(this->window, GLFW_KEY_W) == GLFW_PRESS) {
             this->camera.go_forward(this->delta_time);
         }
 
-        if (glfwGetKey(this->window, GLFW_KEY_S) == 0) {
+        if (glfwGetKey(this->window, GLFW_KEY_S) == GLFW_PRESS) {
             this->camera.go_back(this->delta_time);
         }
 
-        if (glfwGetKey(this->window, GLFW_KEY_D) == 0) {
+        if (glfwGetKey(this->window, GLFW_KEY_D) == GLFW_PRESS) {
             this->camera.go_right(this->delta_time);
         }
 
-        if (glfwGetKey(this->window, GLFW_KEY_A) == 0) {
+        if (glfwGetKey(this->window, GLFW_KEY_A) == GLFW_PRESS) {
             this->camera.go_left(this->delta_time);
         }
 
-        if (glfwGetKey(this->window, GLFW_KEY_SPACE) == 0) {
+        if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS) {
             this->camera.go_up(this->delta_time);
         }
 
