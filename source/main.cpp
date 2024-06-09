@@ -6,10 +6,6 @@
 #include "user_interface.hpp"
 
 #include <chrono>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/euler_angles.hpp>
-#include <numbers>
 #include <print>
 
 static int g_width = 1600, g_height = 900;
