@@ -15,9 +15,14 @@ class Engine
     auto frame() -> void;
 
         private:
-    int width = 0;
-    int height = 0;
+    GLFWwindow* window;
+    int width;
+    int height;
 
     UI user_interface;
     Camera camera;
+
+    // environment booleans
+    bool run = true;
+    float delta_time = 0.0F;
 };

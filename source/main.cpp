@@ -119,43 +119,6 @@ main() -> int
     gl::glDeleteShader(vert);
     gl::glDeleteShader(frag);
 
-    // main loop
-    float delta_time = 0;
-    while (glfwWindowShouldClose(window) == 0) {
-        auto loop_start = std::chrono::high_resolution_clock::now();
-
-        // TODO this should be in its own thread.
-        glfwPollEvents();
-        input.check_for_input();
-
-        gl::glClearColor(0, 0, 0, 1);
-        gl::glClearDepth(1);
-        gl::glEnable(gl::GL_DEPTH_TEST);
-        gl::glDepthFunc(gl::GL_LEQUAL);
-        gl::glClear(gl::GL_COLOR_BUFFER_BIT | gl::GL_DEPTH_BUFFER_BIT);
-
-        mesh.draw();
-
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        user_inter.draw();
-
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        glfwSwapBuffers(window);
-
-        auto loop_end                     = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<float> time = loop_end - loop_start;
-        delta_time                        = time.count();
-
-#ifdef _DEBUG
-        glfwSetWindowTitle(window, std::format("ClosedGL {}fps", static_cast<int>(1.0F / delta_time)).c_str());
-#endif
-    }
-
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
 
