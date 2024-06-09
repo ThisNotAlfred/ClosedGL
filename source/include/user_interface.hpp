@@ -14,7 +14,6 @@ class UI
     auto top_menu() -> void;
     auto toolset() -> void;
 
-
     bool show_toolset = true;
     GLFWwindow* window {};
 };
