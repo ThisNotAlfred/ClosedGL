@@ -1,4 +1,5 @@
 #include "engine.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 #include <print>
 
@@ -84,6 +85,13 @@ Engine::frame() -> void
     gl::glClear(gl::GL_COLOR_BUFFER_BIT | gl::GL_DEPTH_BUFFER_BIT);
 
     gl::glUseProgram(this->shaders[0]);
+
+    auto projection_matrix = Camera::get_projection_matrix(width, height);
+    auto view_matrix       = this->camera.get_view_matrix();
+
+    gl::glProgramUniformMatrix4fv(this->shaders[0], 0, 1, false, glm::value_ptr(projection_matrix));
+    gl::glProgramUniformMatrix4fv(this->shaders[0], 1, 1, false, glm::value_ptr(view_matrix));
+
     this->meshes[0].draw();
 
     ImGui_ImplOpenGL3_NewFrame();
