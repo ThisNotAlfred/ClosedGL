@@ -11,6 +11,7 @@
 struct Vertex {
     fastgltf::math::fvec3 position;
     fastgltf::math::fvec3 normal;
+    fastgltf::math::fvec4 tangent;
     fastgltf::math::fvec2 uv;
 };
 
