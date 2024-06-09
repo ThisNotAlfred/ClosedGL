@@ -91,7 +91,7 @@ main() -> int
     auto user_inter = UI(window);
 
     // TODO make this value not hard coded!
-    auto path = std::filesystem::path("../bin/DragonAttenuation.glb");
+    auto path = std::filesystem::path("../bin/Avocado.glb");
     auto mesh = Mesh(path);
 
     if (!mesh.create_buffers()) {
@@ -142,11 +142,11 @@ main() -> int
     auto mat_view  = glm::mat4(1);
     auto mat_model = glm::mat4(1);
 
-    glm::vec3 cam_pos     = glm::vec3(0.0F, 0.0F, 10.0F);
+    glm::vec3 cam_pos     = glm::vec3(0.0F, 0.0F, 1.0F);
     glm::vec3 cam_up      = glm::vec3(0.0F, 1.0F, 0.0F);
-    float cam_speed_zoom  = 10;
-    float cam_speed_yaw   = 1;
-    float cam_speed_pitch = 1;
+    float cam_speed_zoom  = 1;
+    float cam_speed_yaw   = 0.1;
+    float cam_speed_pitch = 0.1;
 
     // main loop
     float total_time = 0;
@@ -164,7 +164,7 @@ main() -> int
 
         glfwPollEvents();
 
-        mat_model   = glm::eulerAngleYXZ<float>(1.57F, 1.57F, total_time * 2.0F);
+        mat_model   = glm::eulerAngleYXZ<float>(total_time * 2.0F, 0, 0);
 
         double mousex;
         double mousey;
@@ -205,6 +205,7 @@ main() -> int
         gl::glProgramUniformMatrix4fv(program, 0, 1, false, glm::value_ptr(mat_proj));
         gl::glProgramUniformMatrix4fv(program, 1, 1, false, glm::value_ptr(mat_view));
         gl::glProgramUniformMatrix4fv(program, 2, 1, false, glm::value_ptr(mat_model));
+        gl::glProgramUniform3fv(program, 3, 1, glm::value_ptr(cam_pos));
 
         mesh.draw();
 

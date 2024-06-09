@@ -152,9 +152,9 @@ Mesh::draw() const -> void
 {
     // TODO(StaticSaga): do not hardcode this
     int unit = 0;
-    gl::glBindTextureUnit(unit, this->textures[1]);
+    gl::glBindTextureUnit(unit, this->textures[0]);
     gl::glBindVertexArray(this->vertex_array);
-    gl::glUniform1i(3, unit);
+    gl::glUniform1i(4, unit);
 
     gl::glDrawElements(gl::GL_TRIANGLES, this->indices_count, gl::GL_UNSIGNED_INT, this->indices.data());
 }
