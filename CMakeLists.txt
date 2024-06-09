@@ -14,14 +14,18 @@ target_sources(
     
     # sources
     "${ClosedGl_SOURCE_DIR}/main.cpp"
+    "${ClosedGl_SOURCE_DIR}/input.cpp"
     "${ClosedGl_SOURCE_DIR}/mesh.cpp"
     "${ClosedGl_SOURCE_DIR}/tools.cpp"
+    "${ClosedGl_SOURCE_DIR}/camera.cpp"
     "${ClosedGl_SOURCE_DIR}/user_interface.cpp"
 
     # headers
     "${ClosedGl_INCLUDE_DIR}/closed_gl.hpp"
+    "${ClosedGl_INCLUDE_DIR}/input.hpp"
     "${ClosedGl_INCLUDE_DIR}/mesh.hpp"
     "${ClosedGl_INCLUDE_DIR}/tools.hpp"
+    "${ClosedGl_INCLUDE_DIR}/camera.hpp"
     "${ClosedGl_INCLUDE_DIR}/user_interface.hpp"
 )
 
