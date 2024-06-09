@@ -38,13 +38,13 @@ main() -> int
     auto* window = glfwCreateWindow(g_width, g_height, "ClosedGL", nullptr, nullptr);
     if (window == nullptr) {
 #ifdef _DEBUG
-        std::cerr << "failed to creat the window";
+        std::print(stderr, "failed to creat the window");
 #endif
         glfwTerminate();
         return -1;
     }
 
-    glfwSetKeyCallback(window, key_callback);
+    auto input = Input(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPos(window, g_width / 2.0F, g_height / 2.0F);
 
@@ -87,7 +87,6 @@ main() -> int
     auto program = gl::glCreateProgram();
     gl::glProgramParameteri(program, gl::GL_PROGRAM_SEPARABLE, gl::GL_TRUE);
 
-    // here shaders from `shaders/`
     auto vert_path = std::filesystem::path("../shaders/basic.vert");
     auto vert      = compile_shader(vert_path, gl::GL_VERTEX_SHADER);
 
@@ -137,10 +136,11 @@ main() -> int
     // main loop
     float delta_time = 0;
     while (glfwWindowShouldClose(window) == 0) {
-        // setting `loop_start` to calculate `dt` later
         auto loop_start = std::chrono::high_resolution_clock::now();
 
-        // clearing last frame
+        // TODO this should be in its own thread.
+        input.check_for_input();
+
         gl::glClearColor(0, 0, 0, 1);
         gl::glClearDepth(1);
         gl::glEnable(gl::GL_DEPTH_TEST);
@@ -191,21 +191,18 @@ main() -> int
 
         mesh.draw();
 
-        // start imgui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // user interface drawing
         user_inter.draw();
 
-        // rendering imgui windows
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
 
-        // setting `time_point` and calculating `dt`
+
         auto loop_end                     = std::chrono::high_resolution_clock::now();
         std::chrono::duration<float> time = loop_end - loop_start;
         delta_time                        = time.count();
