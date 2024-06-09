@@ -16,8 +16,6 @@ class Engine
     auto init() -> void;
     auto frame() -> void;
 
-    auto quit() -> void; 
-
         private:
     GLFWwindow* window;
     int width;
@@ -30,6 +28,5 @@ class Engine
     std::vector<gl::GLuint> shaders;
 
     // environment booleans
-    bool running = true;
     float delta_time = 0.0F;
 };

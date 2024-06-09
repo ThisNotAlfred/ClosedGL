@@ -71,7 +71,6 @@ Engine::init() -> void
 auto
 Engine::frame() -> void
 {
-    while (this->running) {
         auto loop_start = std::chrono::high_resolution_clock::now();
 
         // updating camera
@@ -103,9 +102,4 @@ Engine::frame() -> void
 #ifdef _DEBUG
         glfwSetWindowTitle(window, std::format("ClosedGL {}fps", static_cast<int>(1.0F / delta_time)).c_str());
 #endif
-    }
-}
-
-auto Engine::quit() -> void {
-    this->running = false;
 }

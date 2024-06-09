@@ -8,7 +8,6 @@
 #include <chrono>
 #include <filesystem>
 #include <print>
-#include <thread>
 
 static int g_width = 1600, g_height = 900;
 
@@ -39,6 +38,7 @@ main() -> int
         return -1;
     }
 
+    glfwSetFramebufferSizeCallback(window, nullptr);
     glfwMakeContextCurrent(window);
 
     // setting up imgui
@@ -73,11 +73,10 @@ main() -> int
     engine.init();
 
     // core
-    std::thread engine_thread(&Engine::frame, &engine);
-    std::thread input_thread(&Input::check_for_input, &input);
-
-    engine_thread.join();
-    input_thread.join();
+    while (glfwWindowShouldClose(window) == 0) {
+        input.check_for_input();
+        engine.frame();
+    }
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
