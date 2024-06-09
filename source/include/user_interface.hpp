@@ -5,6 +5,7 @@
 class UI
 {
         public:
+    explicit UI();
     UI(GLFWwindow* window) : window(window) {};
     ~UI() = default;
 

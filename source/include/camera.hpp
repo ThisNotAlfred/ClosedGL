@@ -3,6 +3,7 @@
 class Camera
 {
         public:
+    explicit Camera();
     Camera(short movement_speed, short scrolling_speed, float spinning_speed)
         : movement_speed(movement_speed), scrolling_speed(scrolling_speed), spinning_speed(spinning_speed) {};
     ~Camera() = default;
