@@ -1,5 +1,6 @@
 #include "engine.hpp"
-#include "glm/gtc/type_ptr.hpp"
+
+#include <glm/gtc/type_ptr.hpp>
 
 #include <print>
 
@@ -11,7 +12,7 @@ Engine::Engine(GLFWwindow* window)
 
     // initilizing default values
     this->user_interface = UI(window);
-    this->camera         = Camera(10, 3, 0.03F);
+    this->camera         = Camera(10, 3, 0.01F);
 }
 
 auto

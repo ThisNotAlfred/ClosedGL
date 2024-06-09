@@ -2,6 +2,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/transform.hpp>
 
@@ -14,16 +15,16 @@ static constexpr glm::vec3 world_forward = glm::vec3(0, 0, 1);
 auto
 Camera::transform() -> void
 {
-    auto quaternion = glm::quat(glm::vec3(this->yaw, this->pitch, 0));
+    auto quaternion      = glm::quat(glm::vec3(this->pitch, this->yaw, 0));
+    auto movement_vector = glm::vec3(this->right_and_left, this->up_and_down, this->forward_and_back);
+
 
     this->up     = glm::rotate(quaternion, world_up);
     this->target = glm::normalize(glm::rotate(quaternion, world_forward));
 
-    auto movement_vector = glm::vec3(this->right_and_left, this->up_and_down, this->forward_and_back);
-    auto direction       = glm::rotate(quaternion, movement_vector);
-
-    auto translation_matrix = glm::translate(glm::mat4(), movement_vector);
-    this->position          = glm::mat3(translation_matrix) * this->position;
+    auto direction          = glm::rotate(quaternion, movement_vector);
+    auto translation_matrix = glm::translate(glm::mat4(1.0F), direction);
+    this->position          = translation_matrix * glm::vec4(this->position, 1.0F);
 
     this->forward_and_back = 0;
     this->right_and_left   = 0;
@@ -45,13 +46,13 @@ Camera::go_back(float delta_time) -> void
 auto
 Camera::go_right(float delta_time) -> void
 {
-    this->right_and_left += delta_time * movement_speed;
+    this->right_and_left -= delta_time * movement_speed;
 }
 
 auto
 Camera::go_left(float delta_time) -> void
 {
-    this->right_and_left -= delta_time * movement_speed;
+    this->right_and_left += delta_time * movement_speed;
 }
 
 auto
@@ -87,5 +88,5 @@ Camera::get_projection_matrix(int width, int height) -> glm::mat4
 auto
 Camera::get_view_matrix() const -> glm::mat4
 {
-    return glm::lookAtRH(this->position, this->target + this->position, this->up);
+    return glm::lookAtRH(this->position, this->position + this->target, this->up);
 }
