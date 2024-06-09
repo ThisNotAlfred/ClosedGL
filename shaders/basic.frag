@@ -13,7 +13,7 @@ layout(location = 3) uniform vec3 cam_pos;
 layout(location = 4) uniform sampler2D tex_albedo;
 layout(location = 5) uniform sampler2D tex_normal;
 
-vec3 light_dir = vec3(0.0f, 1.0f, 1.0f);
+vec3 light_dir = vec3(0.0f, 1.0f, 0.0f);
 
 const float GAMMA = 2.2;
 
