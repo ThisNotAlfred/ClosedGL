@@ -19,15 +19,15 @@ Camera::transform() -> void
     this->up     = glm::rotate(quaternion, world_up);
     this->target = glm::normalize(glm::rotate(quaternion, world_forward));
 
-    auto movement_vector    = glm::vec3(this->right_and_left, this->up_and_down, this->forward_and_back);
-    auto direction = glm::rotate(quaternion, movement_vector);
+    auto movement_vector = glm::vec3(this->right_and_left, this->up_and_down, this->forward_and_back);
+    auto direction       = glm::rotate(quaternion, movement_vector);
 
     auto translation_matrix = glm::translate(glm::mat4(), movement_vector);
-    this->position = translation_matrix * this->position;
+    this->position          = glm::mat3(translation_matrix) * this->position;
 
     this->forward_and_back = 0;
-    this->right_and_left = 0;
-    this->up_and_down = 0;
+    this->right_and_left   = 0;
+    this->up_and_down      = 0;
 }
 
 auto
@@ -79,19 +79,13 @@ Camera::rotate(float mouse_x, float mouse_y) -> void
 }
 
 auto
-Camera::get_projection_matrix() const -> glm::mat4
+Camera::get_projection_matrix(int width, int height) -> glm::mat4
 {
-    return this->projection;
+    return glm::perspective(glm::radians(30.0F), static_cast<float>(width) / static_cast<float>(height), 0.01F, 100.0F);
 }
 
 auto
 Camera::get_view_matrix() const -> glm::mat4
 {
-    return this->view;
-}
-
-auto
-Camera::get_model_matrix() const -> glm::mat4
-{
-    return this->model;
+    return glm::lookAtRH(this->position, this->target + this->position, this->up);
 }
