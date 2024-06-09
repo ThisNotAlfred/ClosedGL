@@ -10,8 +10,12 @@ out vec4 color_output;
 
 layout(location = 3) uniform sampler2D tex_1;
 
+vec3 light_pos = vec3(100.0f, 100.0f, 0.0f);
+
 float fd_lambert() {
-    return 1.0 / 3.14f;
+    vec3 N = normalize(normal_in);
+    vec3 L = normalize(light_pos - frag_pos);
+    return max(dot(N, L), 0.0f);
 }
 
 void main() {

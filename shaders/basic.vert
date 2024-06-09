@@ -22,7 +22,8 @@ void main() {
     gl_Position = projection * view * model * vec4(position_in, 1.0f);
 
     position_out = position_in;
-    normal_out = normal_in;
+    // TODO: calculate this cpuside
+    normal_out = mat3(transpose(inverse(view * model))) * normal_in;
     uv_out = uv_in;
 
     frag_pos = vec3(model * vec4(position_in, 1.0f));

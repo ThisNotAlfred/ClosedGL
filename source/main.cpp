@@ -149,6 +149,7 @@ main() -> int
     float cam_speed_pitch = 1;
 
     // main loop
+    float total_time = 0;
     float delta_time = 0;
     while (glfwWindowShouldClose(window) == 0) {
         // setting `loop_start` to calculate `dt` later
@@ -162,6 +163,8 @@ main() -> int
         gl::glClear(gl::GL_COLOR_BUFFER_BIT | gl::GL_DEPTH_BUFFER_BIT);
 
         glfwPollEvents();
+
+        mat_model   = glm::eulerAngleYXZ<float>(1.57F, 1.57F, total_time * 2.0F);
 
         double mousex;
         double mousey;
@@ -223,6 +226,7 @@ main() -> int
         auto loop_end                     = std::chrono::high_resolution_clock::now();
         std::chrono::duration<float> time = loop_end - loop_start;
         delta_time                        = time.count();
+        total_time += delta_time;
 
 #ifdef _DEBUG
         glfwSetWindowTitle(window, std::format("ClosedGL {}fps", static_cast<int>(1.0F / delta_time)).c_str());
