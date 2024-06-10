@@ -101,6 +101,7 @@ Engine::frame() -> void
     gl::glProgramUniformMatrix4fv(this->shaders[0], 0, 1, false, glm::value_ptr(projection_matrix));
     gl::glProgramUniformMatrix4fv(this->shaders[0], 1, 1, false, glm::value_ptr(view_matrix));
     gl::glProgramUniformMatrix4fv(this->shaders[0], 2, 1, false, glm::value_ptr(model_matrix));
+    gl::glProgramUniform3fv(this->shaders[0], 3, 1, glm::value_ptr(this->camera.get_position()));
 
     this->meshes[0].draw();
 

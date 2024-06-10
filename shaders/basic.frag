@@ -18,6 +18,10 @@ vec3 light_dir = vec3(0.0f, 1.0f, 0.0f);
 const float GAMMA = 2.2;
 
 void main() {
+    // FIXME: this is converting left-handed to right-handed
+    vec3 cam_pos = cam_pos;
+    cam_pos.z *= -1;
+
     vec3 normal_tex = texture(tex_normal, uv_in).xyz * 2.0 - 1.0;
 	vec3 N = normalize(normal_in), T = normalize(tangent_in.xyz);
 	vec3 B = cross(normal_in, tangent_in.xyz) * tangent_in.w;
@@ -38,8 +42,5 @@ void main() {
 
     vec3 reinhard = color / (color + vec3(1.0));
     vec3 corrected = pow(reinhard, vec3(1.0 / GAMMA));
-    color_output = vec4(corrected, 1.0);
-
-    // TODO: remove me
-    color_output = vec4(1.0);
+    color_output = vec4(specular, 1.0);
 }

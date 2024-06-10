@@ -90,3 +90,10 @@ Camera::get_view_matrix() const -> glm::mat4
 {
     return glm::lookAtRH(this->position, this->position + this->target, this->up);
 }
+
+auto
+Camera::get_position() const -> glm::vec3
+{
+    return this->position;
+}
+

@@ -24,15 +24,16 @@ class Camera
 
     [[nodiscard]] static auto get_projection_matrix(int width, int height) -> glm::mat4;
     [[nodiscard]] auto get_view_matrix() const -> glm::mat4;
+    [[nodiscard]] auto get_position() const -> glm::vec3;
 
         private:
     float movement_speed;
     float scrolling_speed;
     float spinning_speed;
 
-    glm::vec3 position = glm::vec4(0, 0, -1, 0);
-    glm::vec3 up       = glm::vec4(0, 1, 0, 0);
-    glm::vec3 target   = glm::vec4();
+    glm::vec3 position = glm::vec3(0, 0, -1);
+    glm::vec3 up       = glm::vec3(0, 1, 0);
+    glm::vec3 target   = glm::vec3();
 
     float pitch;
     float yaw;
