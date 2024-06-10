@@ -74,6 +74,7 @@ main() -> int
     while (glfwWindowShouldClose(window) == 0) {
         engine.check_for_input();
         engine.frame();
+
     }
 
     ImGui_ImplOpenGL3_Shutdown();
