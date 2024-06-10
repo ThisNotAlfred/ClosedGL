@@ -8,8 +8,8 @@
 
 #include <glm/gtx/euler_angles.hpp>
 
-#include <numbers>
 #include <chrono>
+#include <numbers>
 #include <print>
 
 static int g_width = 1600, g_height = 900;
@@ -85,7 +85,7 @@ main() -> int
     }
 
     // here shaders from `shaders/`
-    auto link_shader = [](gl::GLuint program, gl::GLuint vert, gl::GLuint frag){
+    auto link_shader = [](gl::GLuint program, gl::GLuint vert, gl::GLuint frag) {
         gl::glAttachShader(program, vert);
         gl::glAttachShader(program, frag);
 
@@ -159,7 +159,7 @@ main() -> int
 
         glfwPollEvents();
 
-        mat_model   = glm::eulerAngleYXZ<float>(total_time * 2.0F, 0, 0);
+        mat_model = glm::eulerAngleYXZ<float>(total_time * 2.0F, 0, 0);
 
         double mousex;
         double mousey;
@@ -206,18 +206,18 @@ main() -> int
 
         // TODO: duplicate in fragment shader
         // what should i set this to?
-        
+
         auto light_dir = glm::vec3(0.0F, -1.0F, 0.0F);
 
         auto shadow_proj = glm::ortho<float>(-0.25, 0.25, -0.25, 0.25, 0.1F, 10.0F);
-        auto shadow_view = glm::lookAt(light_dir, glm::vec3(0,0,0), glm::vec3(0,1,0));
-        gl::glBindFramebuffer(gl::GL_FRAMEBUFFER, fbo);    
+        auto shadow_view = glm::lookAt(light_dir, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+        gl::glBindFramebuffer(gl::GL_FRAMEBUFFER, fbo);
         gl::glUseProgram(shadow_program);
         gl::glProgramUniformMatrix4fv(shadow_program, 0, 1, false, glm::value_ptr(shadow_proj));
         gl::glProgramUniformMatrix4fv(shadow_program, 1, 1, false, glm::value_ptr(shadow_view));
         gl::glProgramUniformMatrix4fv(shadow_program, 2, 1, false, glm::value_ptr(mat_model));
         mesh.draw();
-        
+
         gl::glBindFramebuffer(gl::GL_FRAMEBUFFER, 0);
 
         // rendering to frontbuffer
@@ -245,10 +245,10 @@ main() -> int
 
         glfwSwapBuffers(window);
 
-        auto loop_end                     = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<float> time = loop_end - loop_start;
-        delta_time                        = time.count();
-        total_time += delta_time;
+        auto loop_end                      = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<float> time  = loop_end - loop_start;
+        delta_time                         = time.count();
+        total_time                        += delta_time;
 
 #ifdef _DEBUG
         glfwSetWindowTitle(window, std::format("ClosedGL {}fps", static_cast<int>(1.0F / delta_time)).c_str());
