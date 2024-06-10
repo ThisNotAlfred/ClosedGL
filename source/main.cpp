@@ -1,10 +1,14 @@
 #include "closed_gl.hpp"
 
+#include "glm/gtc/type_ptr.hpp"
 #include "input.hpp"
 #include "mesh.hpp"
 #include "tools.hpp"
 #include "user_interface.hpp"
 
+#include <glm/gtx/euler_angles.hpp>
+
+#include <numbers>
 #include <chrono>
 #include <print>
 
