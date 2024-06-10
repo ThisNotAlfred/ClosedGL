@@ -28,9 +28,10 @@ class Engine
     // TODO use a better structur rather than a simple vector for handling mehses and shaders
     std::vector<Mesh> meshes;
     std::vector<gl::GLuint> shaders;
+    gl::GLuint shadow_shader;
 
-    // environment booleans
     float delta_time = 0.0F;
+    float total_time = 0.0F; 
 
     // input variables
     bool is_left_alt_down   = false;

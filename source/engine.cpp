@@ -1,6 +1,7 @@
 #include "engine.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/euler_angles.hpp>
 
 #include <print>
 
@@ -15,35 +16,13 @@ Engine::Engine(GLFWwindow* window)
     this->camera         = Camera(10, 3, 0.01F);
 }
 
-auto
-Engine::init() -> void
-{
-    // TODO make this value not hard coded!
-    auto path = std::filesystem::path("../bin/DragonAttenuation.glb");
-    auto mesh = Mesh(path);
-
-    if (!mesh.create_buffers()) {
-        std::println(stderr, "failed to load the mesh\n");
-    }
-
-    meshes.push_back(mesh);
-
-    auto program = gl::glCreateProgram();
-    gl::glProgramParameteri(program, gl::GL_PROGRAM_SEPARABLE, gl::GL_TRUE);
-
-    auto vert_path = std::filesystem::path("../shaders/basic.vert");
-    auto vert      = compile_shader(vert_path, gl::GL_VERTEX_SHADER);
-
-    auto frag_path = std::filesystem::path("../shaders/basic.frag");
-    auto frag      = compile_shader(frag_path, gl::GL_FRAGMENT_SHADER);
-
+static auto
+link_shader(gl::GLuint program, gl::GLuint vert, gl::GLuint frag) -> void {
     gl::glAttachShader(program, vert);
     gl::glAttachShader(program, frag);
 
-    gl::glBindFragDataLocation(program, 0, "color_output");
 
     gl::glLinkProgram(program);
-
     gl::GLboolean is_linked;
     gl::glGetProgramiv(program, gl::GL_LINK_STATUS, &is_linked);
     if (is_linked == gl::GL_FALSE) {
@@ -66,8 +45,37 @@ Engine::init() -> void
 
     gl::glDeleteShader(vert);
     gl::glDeleteShader(frag);
+}
 
+auto
+Engine::init() -> void
+{
+    // TODO make this value not hard coded!
+    auto path = std::filesystem::path("../bin/Avocado.glb");
+    auto mesh = Mesh(path);
+
+    if (!mesh.create_buffers()) {
+        std::println(stderr, "failed to load the mesh\n");
+    }
+
+    meshes.push_back(mesh);
+
+    auto program = gl::glCreateProgram();
+    gl::glProgramParameteri(program, gl::GL_PROGRAM_SEPARABLE, gl::GL_TRUE);
+    auto vert_path = std::filesystem::path("../shaders/basic.vert");
+    auto frag_path = std::filesystem::path("../shaders/basic.frag");
+    auto vert      = compile_shader(vert_path, gl::GL_VERTEX_SHADER);
+    auto frag      = compile_shader(frag_path, gl::GL_FRAGMENT_SHADER);
+    link_shader(program, vert, frag);
     this->shaders.push_back(program);
+
+    auto shadow_program   = gl::glCreateProgram();
+    auto shadow_vert_path = std::filesystem::path("../shaders/shadow.vert");
+    auto shadow_frag_path = std::filesystem::path("../shaders/shadow.frag");
+    auto shadow_vert      = compile_shader(shadow_vert_path, gl::GL_VERTEX_SHADER);
+    auto shadow_frag      = compile_shader(shadow_frag_path, gl::GL_FRAGMENT_SHADER);
+    link_shader(shadow_program, shadow_vert, shadow_frag);
+    shadow_shader = shadow_program;
 }
 
 auto
@@ -89,9 +97,10 @@ Engine::frame() -> void
 
     auto projection_matrix = Camera::get_projection_matrix(width, height);
     auto view_matrix       = this->camera.get_view_matrix();
-
+    auto model_matrix    = glm::eulerAngleYXZ<float>(this->total_time * 2.0F, 0, 0); // this is for testing
     gl::glProgramUniformMatrix4fv(this->shaders[0], 0, 1, false, glm::value_ptr(projection_matrix));
     gl::glProgramUniformMatrix4fv(this->shaders[0], 1, 1, false, glm::value_ptr(view_matrix));
+    gl::glProgramUniformMatrix4fv(this->shaders[0], 2, 1, false, glm::value_ptr(model_matrix));
 
     this->meshes[0].draw();
 
@@ -113,6 +122,7 @@ Engine::frame() -> void
     auto loop_end                     = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float> time = loop_end - loop_start;
     delta_time                        = time.count();
+    this->total_time += delta_time;
 }
 
 auto

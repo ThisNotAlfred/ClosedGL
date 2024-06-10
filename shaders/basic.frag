@@ -39,4 +39,7 @@ void main() {
     vec3 reinhard = color / (color + vec3(1.0));
     vec3 corrected = pow(reinhard, vec3(1.0 / GAMMA));
     color_output = vec4(corrected, 1.0);
+
+    // TODO: remove me
+    color_output = vec4(1.0);
 }
