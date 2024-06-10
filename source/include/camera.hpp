@@ -4,7 +4,7 @@ class Camera
 {
         public:
     explicit Camera() = default;
-    Camera(short movement_speed, short scrolling_speed, float spinning_speed)
+    Camera(float movement_speed, float scrolling_speed, float spinning_speed)
         : movement_speed(movement_speed), scrolling_speed(scrolling_speed), spinning_speed(spinning_speed) {};
     ~Camera() = default;
 
@@ -30,7 +30,7 @@ class Camera
     float scrolling_speed;
     float spinning_speed;
 
-    glm::vec3 position = glm::vec4(0, 0, 0, 0);
+    glm::vec3 position = glm::vec4(0, 0, -1, 0);
     glm::vec3 up       = glm::vec4(0, 1, 0, 0);
     glm::vec3 target   = glm::vec4();
 

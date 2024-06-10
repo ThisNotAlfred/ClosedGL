@@ -13,7 +13,7 @@ Engine::Engine(GLFWwindow* window)
 
     // initilizing default values
     this->user_interface = UI(window);
-    this->camera         = Camera(10, 3, 0.01F);
+    this->camera         = Camera(0.5F, 0.05F, 0.0F);
 }
 
 static auto
