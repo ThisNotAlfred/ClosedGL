@@ -158,14 +158,12 @@ Mesh::destroy() -> void
 auto
 Mesh::draw() const -> void
 {
-    // TODO(StaticSaga): do not hardcode this
     gl::glBindVertexArray(this->vertex_array);
     int albedo_unit = 0, normal_unit = 1;
     gl::glBindTextureUnit(albedo_unit, this->textures[0]);
     gl::glUniform1i(4, albedo_unit);
     gl::glBindTextureUnit(normal_unit, this->textures[2]);
     gl::glUniform1i(5, normal_unit);
-
 
     gl::glDrawElements(gl::GL_TRIANGLES, this->indices_count, gl::GL_UNSIGNED_INT, this->indices.data());
 }
