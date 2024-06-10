@@ -1,4 +1,5 @@
 #include "gltf.hpp"
+
 #include "tools.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -20,19 +21,21 @@ Gltf::load_nodes() -> bool
         return false;
     }
 
-    auto asset = parser.loadGltf(data.get(), path.parent_path());
+    auto fastgltf_options = fastgltf::Options::DecomposeNodeMatrices;
+
+    auto asset = parser.loadGltf(data.get(), path.parent_path(), fastgltf_options);
     if (auto error = asset.error(); error != fastgltf::Error::None) {
         return false;
     }
 
     // gathering data for all the nodes
     std::vector<std::size_t> node_indices;
-    for (auto& scene : asset->scenes) {
+    for (const auto& scene : asset->scenes) {
         node_indices.insert(node_indices.end(), scene.nodeIndices.begin(), scene.nodeIndices.end());
     }
 
     std::vector<std::size_t> children_indices;
-    for (auto& node : asset->nodes) {
+    for (const auto& node : asset->nodes) {
         children_indices.insert(children_indices.end(), node.children.begin(), node.children.end());
     }
 
@@ -43,17 +46,25 @@ Gltf::load_nodes() -> bool
     for (const auto& node_index : node_indices) {
         const auto& node = asset->nodes[node_index];
 
-        if (node.cameraIndex.has_value()) {
-            cameras.push_back(asset->cameras[node.cameraIndex.value()]);
-        }
-
         if (node.lightIndex.has_value()) {
-            lights.push_back(asset->lights[node.lightIndex.value()]);
+            // getting the rotation, scale, and translation
+            assert(std::holds_alternative<fastgltf::TRS>(node.transform));
+            const auto& translation = std::get<fastgltf::TRS>(node.transform).translation;
+            const auto& scale       = std::get<fastgltf::TRS>(node.transform).scale;
+            const auto& rotation    = std::get<fastgltf::TRS>(node.transform).rotation;
+
+            const auto& intensity = asset->lights[node.lightIndex.value()].intensity;
+            const auto& color     = asset->lights[node.lightIndex.value()].color;
+            this->lights.push_back(PointLight { translation, scale, rotation, color, intensity });
         }
 
         if (node.meshIndex.has_value()) {
-            meshes.push_back(asset->meshes[node.meshIndex.value()]);
         }
+    }
+
+    // loading all the textures
+    for (const auto& texture : asset->textures) {
+        this->textures.push_back(texture);
     }
 
 #ifdef _DEBUG
@@ -61,6 +72,22 @@ Gltf::load_nodes() -> bool
 #endif
 
     return true;
+}
+
+auto
+Gltf::load_meshes() -> Vertex
+{
+}
+
+auto
+Gltf::load_lights() -> std::vector<std::variant<PointLight>>
+{
+    std::vector<std::variant<PointLight>> lights;
+
+    for (const auto& light : this->lights) {
+    }
+
+    return lights;
 }
 
 auto

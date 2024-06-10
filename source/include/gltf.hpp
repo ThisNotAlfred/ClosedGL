@@ -8,17 +8,30 @@
 
 #include <filesystem>
 
-struct Gltf {
+struct Vertex {
     fastgltf::math::fvec3 position;
+    
     fastgltf::math::fvec3 normal;
     fastgltf::math::fvec4 tangent;
     fastgltf::math::fvec2 uv;
 };
 
+struct Mesh {
+    fastgltf::math::fvec3 translation;
+    fastgltf::math::fvec3 scale;
+    fastgltf::math::fquat rotation;
+    
+    gl::GLuint vertex_array;
+    gl::GLuint index_array;
+};
+
 struct PointLight {
-    fastgltf::math::fvec3 position;
+    fastgltf::math::fvec3 translation;
+    fastgltf::math::fvec3 scale;
+    fastgltf::math::fquat rotation;
+    
     fastgltf::math::fvec3 color;
-    fastgltf::math::fvec3 intensity;
+    fastgltf::num intensity;
 };
 
 class Gltf
@@ -29,16 +42,15 @@ class Gltf
 
     [[nodiscard]] auto load_nodes() -> bool;
 
-    
-    
-    auto destroy() -> void;
+    [[nodiscard]] auto load_meshes() -> Vertex;
+    [[nodiscard]] auto load_lights() -> std::vector<std::variant<PointLight>>;
 
         private:
     std::filesystem::path path;
 
-    std::vector<fastgltf::Camera> cameras;
-    std::vector<fastgltf::Light> lights;
-    std::vector<fastgltf::Mesh> meshes;
+    std::vector<std::variant<PointLight>> lights;
+    std::vector<Mesh> meshes;
+    std::vector<fastgltf::Texture> textures;
 };
 
 auto compile_shader(std::filesystem::path& path, gl::GLenum shader_type) -> gl::GLuint;
