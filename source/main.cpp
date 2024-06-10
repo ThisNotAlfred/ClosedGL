@@ -1,7 +1,6 @@
 #include "closed_gl.hpp"
 
 #include "engine.hpp"
-#include "mesh.hpp"
 #include "tools.hpp"
 
 #include <chrono>

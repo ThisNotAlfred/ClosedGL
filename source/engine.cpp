@@ -13,7 +13,7 @@ Engine::Engine(GLFWwindow* window)
 
     // initilizing default values
     this->user_interface = UI(window);
-    this->camera         = Camera(0.5F, 0.00F, 0.0005F);
+    this->camera         = Camera(10.0F, 0.0F, 0.05F);
 }
 
 static auto
@@ -52,12 +52,17 @@ Engine::init() -> void
 {
     // TODO make this value not hard coded!
     auto path = std::filesystem::path("../bin/demo_scene.glb");
-    auto mesh = Gltf(path);
-
-    if (!mesh.load_nodes()) {
-        std::println(stderr, "failed to load the mesh\n");
+    auto gltf = Gltf(path);
+    if (!gltf.load_nodes()) {
+        std::println(stderr, "ERROR ENGINE::FRAME -> couln't load gltf");
     }
-    
+
+    auto meshes = gltf.get_scenes();
+    this->scenes.insert(this->scenes.end(), meshes.begin(), meshes.end());
+
+    auto lights = gltf.get_lights();
+    this->lights.insert(this->lights.end(), lights.begin(), lights.end());
+
     auto program = gl::glCreateProgram();
     gl::glProgramParameteri(program, gl::GL_PROGRAM_SEPARABLE, gl::GL_TRUE);
     auto vert_path = std::filesystem::path("../shaders/basic.vert");
@@ -101,6 +106,8 @@ Engine::frame() -> void
     gl::glProgramUniformMatrix4fv(this->shaders[0], 2, 1, false, glm::value_ptr(model_matrix));
     gl::glProgramUniform3fv(this->shaders[0], 3, 1, glm::value_ptr(this->camera.get_position()));
 
+    this->draw_scenes();
+
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -113,7 +120,7 @@ Engine::frame() -> void
                                glbinding::aux::ContextInfo::version().toString(), glbinding::aux::ContextInfo::vendor(),
                                glbinding::aux::ContextInfo::renderer()));
 #endif
-    
+
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -126,14 +133,18 @@ Engine::frame() -> void
 }
 
 auto
-Engine::draw_meshes() const -> void
+Engine::draw_scenes() const -> void
 {
-
+    for (const auto& scene : this->scenes) {
+        gl::glBindVertexArray(scene.vertex_array);
+        gl::glDrawElements(gl::GL_TRIANGLES, scene.index_array.size(), gl::GL_UNSIGNED_INT, scene.index_array.data());
+    }
 }
 
 auto
 Engine::emit_lights() const -> void
 {
+    // TODO: do lighting code here!
 }
 
 auto
