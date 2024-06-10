@@ -99,6 +99,12 @@ Engine::frame() -> void
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
     this->user_interface.draw();
+#ifdef _DEBUG
+    UI::draw_debug(delta_time,
+                   std::format("OPENGL VERSION: {}\nOPENGL VENDOR: {}\nOPENGL RENDERER: {}",
+                               glbinding::aux::ContextInfo::version().toString(), glbinding::aux::ContextInfo::vendor(),
+                               glbinding::aux::ContextInfo::renderer()));
+#endif
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -107,10 +113,6 @@ Engine::frame() -> void
     auto loop_end                     = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float> time = loop_end - loop_start;
     delta_time                        = time.count();
-
-#ifdef _DEBUG
-    glfwSetWindowTitle(window, std::format("ClosedGL {}fps", static_cast<int>(1.0F / delta_time)).c_str());
-#endif
 }
 
 auto

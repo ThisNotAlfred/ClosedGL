@@ -10,6 +10,7 @@ class UI
     ~UI() = default;
 
     auto draw() -> void;
+    static auto draw_debug(float delta_time, std::string_view info) -> void;
 
         private:
     auto top_menu() -> void;
