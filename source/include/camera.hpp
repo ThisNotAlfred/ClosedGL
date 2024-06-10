@@ -42,6 +42,6 @@ class Camera
     float right_and_left;
     float up_and_down;
 
-    float last_mouse_x;
-    float last_mouse_y;
+    float last_mouse_x = 0;
+    float last_mouse_y = 0;
 };

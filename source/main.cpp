@@ -38,6 +38,7 @@ main() -> int
     }
 
     glfwSetFramebufferSizeCallback(window, nullptr);
+    glfwSetCursorPos(window, static_cast<float>(g_width) / 2.0F, static_cast<float>(g_height) / 2.0F);
     glfwMakeContextCurrent(window);
 
     // setting up imgui
@@ -59,11 +60,7 @@ main() -> int
     // initializing opengl
     glbinding::initialize(glfwGetProcAddress, false);
     glbinding::aux::enableGetErrorCallback();
-
-    std::println(stderr, "OPENGL VERSION: {}\nOPENGL VENDOR: {}\nOPENGL RENDERER: {}",
-                 glbinding::aux::ContextInfo::version().toString(), glbinding::aux::ContextInfo::vendor(),
-                 glbinding::aux::ContextInfo::renderer());
-
+    
     // engine starts here
     auto engine = Engine(window);
 
@@ -74,7 +71,6 @@ main() -> int
     while (glfwWindowShouldClose(window) == 0) {
         engine.check_for_input();
         engine.frame();
-
     }
 
     ImGui_ImplOpenGL3_Shutdown();
