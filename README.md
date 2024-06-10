@@ -1,2 +1,3 @@
 # ClosedGL
-shows you closely a model on your like an image viewer in opengl
+
+a simple particle simulator in opengl
