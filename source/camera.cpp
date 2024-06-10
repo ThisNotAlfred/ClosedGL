@@ -96,4 +96,3 @@ Camera::get_position() const -> glm::vec3
 {
     return this->position;
 }
-

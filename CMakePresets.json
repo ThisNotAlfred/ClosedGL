@@ -93,13 +93,13 @@
   "buildPresets": [
     {
       "name": "default-build-linux",
-      "displayName": "Default",
+      "displayName": "Debug",
       "configurePreset": "linux-debug",
       "description": "Vanilla build"
     },
     {
       "name": "default-build-windows",
-      "displayName": "Default",
+      "displayName": "Debug",
       "configurePreset": "x64-debug",
       "description": "Vanilla build"
     },

@@ -13,14 +13,14 @@ Engine::Engine(GLFWwindow* window)
 
     // initilizing default values
     this->user_interface = UI(window);
-    this->camera         = Camera(0.5F, 0.05F, 0.0F);
+    this->camera         = Camera(10.0F, 0.0F, 0.05F);
 }
 
 static auto
-link_shader(gl::GLuint program, gl::GLuint vert, gl::GLuint frag) -> void {
+link_shader(gl::GLuint program, gl::GLuint vert, gl::GLuint frag) -> void
+{
     gl::glAttachShader(program, vert);
     gl::glAttachShader(program, frag);
-
 
     gl::glLinkProgram(program);
     gl::GLboolean is_linked;
@@ -51,14 +51,17 @@ auto
 Engine::init() -> void
 {
     // TODO make this value not hard coded!
-    auto path = std::filesystem::path("../bin/Avocado.glb");
-    auto mesh = Mesh(path);
-
-    if (!mesh.create_buffers()) {
-        std::println(stderr, "failed to load the mesh\n");
+    auto path = std::filesystem::path("../bin/demo_scene.glb");
+    auto gltf = Gltf(path);
+    if (!gltf.load_nodes()) {
+        std::println(stderr, "ERROR ENGINE::FRAME -> couln't load gltf");
     }
 
-    meshes.push_back(mesh);
+    auto meshes = gltf.get_scenes();
+    this->scenes.insert(this->scenes.end(), meshes.begin(), meshes.end());
+
+    auto lights = gltf.get_lights();
+    this->lights.insert(this->lights.end(), lights.begin(), lights.end());
 
     auto program = gl::glCreateProgram();
     gl::glProgramParameteri(program, gl::GL_PROGRAM_SEPARABLE, gl::GL_TRUE);
@@ -97,33 +100,51 @@ Engine::frame() -> void
 
     auto projection_matrix = Camera::get_projection_matrix(width, height);
     auto view_matrix       = this->camera.get_view_matrix();
-    auto model_matrix    = glm::eulerAngleYXZ<float>(this->total_time * 2.0F, 0, 0); // this is for testing
+    auto model_matrix      = glm::eulerAngleYXZ<float>(this->total_time * 2.0F, 0, 0); // this is for testing
     gl::glProgramUniformMatrix4fv(this->shaders[0], 0, 1, false, glm::value_ptr(projection_matrix));
     gl::glProgramUniformMatrix4fv(this->shaders[0], 1, 1, false, glm::value_ptr(view_matrix));
     gl::glProgramUniformMatrix4fv(this->shaders[0], 2, 1, false, glm::value_ptr(model_matrix));
     gl::glProgramUniform3fv(this->shaders[0], 3, 1, glm::value_ptr(this->camera.get_position()));
 
-    this->meshes[0].draw();
+    this->draw_scenes();
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
+
     this->user_interface.draw();
+
 #ifdef _DEBUG
     UI::draw_debug(delta_time,
                    std::format("OPENGL VERSION: {}\nOPENGL VENDOR: {}\nOPENGL RENDERER: {}",
                                glbinding::aux::ContextInfo::version().toString(), glbinding::aux::ContextInfo::vendor(),
                                glbinding::aux::ContextInfo::renderer()));
 #endif
+
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     glfwSwapBuffers(this->window);
 
-    auto loop_end                     = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<float> time = loop_end - loop_start;
-    delta_time                        = time.count();
-    this->total_time += delta_time;
+    auto loop_end                      = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<float> time  = loop_end - loop_start;
+    delta_time                         = time.count();
+    this->total_time                  += delta_time;
+}
+
+auto
+Engine::draw_scenes() const -> void
+{
+    for (const auto& scene : this->scenes) {
+        gl::glBindVertexArray(scene.vertex_array);
+        gl::glDrawElements(gl::GL_TRIANGLES, scene.index_array.size(), gl::GL_UNSIGNED_INT, scene.index_array.data());
+    }
+}
+
+auto
+Engine::emit_lights() const -> void
+{
+    // TODO: do lighting code here!
 }
 
 auto
