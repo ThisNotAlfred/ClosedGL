@@ -19,9 +19,9 @@ struct Scene {
     fastgltf::math::fvec3 translation;
     fastgltf::math::fvec3 scale;
     fastgltf::math::fquat rotation;
-    
-    gl::GLuint vertex_array;
+
     std::vector<std::uint32_t> index_array;
+    gl::GLuint vertex_array;
 };
 
 struct PointLight {
@@ -43,12 +43,13 @@ class Gltf
 
     [[nodiscard]] auto get_scenes() -> std::vector<Scene>;
     [[nodiscard]] auto get_lights() -> std::vector<std::variant<PointLight>>;
+    [[nodiscard]] auto get_textures() -> std::vector<gl::GLuint>;
 
         private:
     std::filesystem::path path;
 
-    std::vector<Scene> meshes;
-    std::vector<fastgltf::Texture> textures;
+    std::vector<Scene> scenes;
+    std::vector<gl::GLuint> textures;
     std::vector<std::variant<PointLight>> lights;
 };
 

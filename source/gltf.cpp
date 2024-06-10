@@ -10,8 +10,7 @@
 auto
 Gltf::load_nodes() -> bool
 {
-    auto fastgltf_extensions = fastgltf::Extensions::KHR_materials_transmission |
-                               fastgltf::Extensions::KHR_materials_variants |
+    auto fastgltf_extensions = fastgltf::Extensions::KHR_materials_transmission | fastgltf::Extensions::KHR_materials_variants |
                                fastgltf::Extensions::KHR_materials_volume | fastgltf::Extensions::KHR_lights_punctual;
 
     fastgltf::Parser parser(fastgltf_extensions);
@@ -70,8 +69,7 @@ Gltf::load_nodes() -> bool
                 gl::GLuint vertex_buffer = 0;
                 gl::glCreateBuffers(1, &vertex_buffer);
 
-                gl::glNamedBufferData(vertex_buffer, position_accessor.count * sizeof(Vertex), nullptr,
-                                      gl::GLenum::GL_STATIC_DRAW);
+                gl::glNamedBufferData(vertex_buffer, position_accessor.count * sizeof(Vertex), nullptr, gl::GLenum::GL_STATIC_DRAW);
 
                 auto* vertices = static_cast<Vertex*>(gl::glMapNamedBuffer(vertex_buffer, gl::GL_WRITE_ONLY));
 
@@ -116,13 +114,10 @@ Gltf::load_nodes() -> bool
                 gl::glEnableVertexArrayAttrib(vertex_array, 2);
                 gl::glEnableVertexArrayAttrib(vertex_array, 3);
 
-                gl::glVertexArrayAttribFormat(vertex_array, 0, 3, gl::GL_FLOAT, gl::GL_FALSE,
-                                              offsetof(Vertex, position));
+                gl::glVertexArrayAttribFormat(vertex_array, 0, 3, gl::GL_FLOAT, gl::GL_FALSE, offsetof(Vertex, position));
                 gl::glVertexArrayAttribFormat(vertex_array, 1, 3, gl::GL_FLOAT, gl::GL_FALSE, offsetof(Vertex, normal));
-                gl::glVertexArrayAttribFormat(vertex_array, 2, 4, gl::GL_FLOAT, gl::GL_FALSE,
-                                              offsetof(Vertex, tangent));
-                gl::glVertexArrayAttribFormat(vertex_array, 3, 2, gl::GL_FLOAT, gl::GL_FALSE,
-                                              offsetof(Vertex, texcoord));
+                gl::glVertexArrayAttribFormat(vertex_array, 2, 4, gl::GL_FLOAT, gl::GL_FALSE, offsetof(Vertex, tangent));
+                gl::glVertexArrayAttribFormat(vertex_array, 3, 2, gl::GL_FLOAT, gl::GL_FALSE, offsetof(Vertex, texcoord));
 
                 gl::glVertexArrayAttribBinding(vertex_array, 0, 0);
                 gl::glVertexArrayAttribBinding(vertex_array, 1, 0);
@@ -135,9 +130,8 @@ Gltf::load_nodes() -> bool
                 auto& index_accesor = asset->accessors[primitive.indicesAccessor.value()];
                 index_array.resize(index_accesor.count);
 
-                fastgltf::iterateAccessorWithIndex<std::uint32_t>(
-                    asset.get(), index_accesor,
-                    [&](std::uint32_t index, std::size_t idx) { index_array[idx] = index; });
+                fastgltf::iterateAccessorWithIndex<std::uint32_t>(asset.get(), index_accesor,
+                                                                  [&](std::uint32_t index, std::size_t idx) { index_array[idx] = index; });
 
                 // getting the rotation, scale, and translation
                 assert(std::holds_alternative<fastgltf::TRS>(node.transform));
@@ -146,13 +140,59 @@ Gltf::load_nodes() -> bool
                 const auto& rotation    = std::get<fastgltf::TRS>(node.transform).rotation;
 
                 // creating mesh object
-                this->meshes.push_back(Scene { translation, scale, rotation, vertex_array, index_array });
+                this->scenes.push_back(Scene {
+                    translation,
+                    scale,
+                    rotation,
+                    index_array,
+                    vertex_array
+                });
             }
         }
     }
 
-    // loading all the textures
-    for (const auto& texture : asset->textures) {
+    // loading images from the binary
+    for (auto& image : asset->images) {
+
+        gl::GLuint texture;
+        glCreateTextures(gl::GL_TEXTURE_2D, 1, &texture);
+
+        std::visit(fastgltf::visitor {
+                       [](auto& arg) {},
+
+                       [&](fastgltf::sources::URI& filePath) {
+                           // TODO:
+                           assert(false);
+                       },
+
+                       [&](fastgltf::sources::Array& vector) { assert(false); },
+
+                       [&](fastgltf::sources::BufferView& view) {
+                           auto& buf_view = asset->bufferViews[view.bufferViewIndex];
+                           auto& buffer   = asset->buffers[buf_view.bufferIndex];
+
+                           // TODO(StaticSaga): i took this code from an example, this is doing needless copying which
+                           // should be avoided
+                           std::visit(fastgltf::visitor { [](auto& arg) {},
+                                                          [&](fastgltf::sources::Array& array) {
+                                                              int width;
+                                                              int height;
+                                                              int channels;
+                                                              unsigned char* data = stbi_load_from_memory(
+                                                                  array.bytes.data() + buf_view.byteOffset, (int)buf_view.byteLength,
+                                                                  &width, &height, &channels, 4);
+                                                              int levels = 1 + (int)log2(std::max(width, height));
+                                                              glTextureStorage2D(texture, levels, gl::GL_RGBA8, width, height);
+                                                              glTextureSubImage2D(texture, 0, 0, 0, width, height, gl::GL_RGBA,
+                                                                                  gl::GL_UNSIGNED_BYTE, data);
+                                                              stbi_image_free(data);
+                                                          } },
+                                      buffer.data);
+                       },
+                   },
+                   image.data);
+
+        gl::glGenerateTextureMipmap(texture);
         this->textures.push_back(texture);
     }
 
@@ -166,13 +206,19 @@ Gltf::load_nodes() -> bool
 auto
 Gltf::get_scenes() -> std::vector<Scene>
 {
-    return this->meshes;
+    return this->scenes;
 }
 
 auto
 Gltf::get_lights() -> std::vector<std::variant<PointLight>>
 {
     return this->lights;
+}
+
+auto
+Gltf::get_textures() -> std::vector<gl::GLuint>
+{
+    return this->textures;
 }
 
 auto
