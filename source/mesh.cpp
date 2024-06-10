@@ -85,7 +85,10 @@ Mesh::create_buffers() -> bool
                 auto& position_accessor = asset->accessors[position_it->second];
 
                 const auto* normal_it = primitive.findAttribute("NORMAL");
-                auto& normal_accessor = asset->accessors[position_it->second];
+                auto& normal_accessor = asset->accessors[normal_it->second];
+
+                const auto* tangent_it = primitive.findAttribute("TANGENT");
+                auto& tangent_accessor = asset->accessors[tangent_it->second];
 
                 const auto* uv_it = primitive.findAttribute("TEXCOORD_0");
                 auto& uv_accessor = asset->accessors[uv_it->second];
@@ -104,10 +107,12 @@ Mesh::create_buffers() -> bool
                 fastgltf::iterateAccessorWithIndex<fastgltf::math::fvec3>(
                     asset.get(), position_accessor,
                     [&](const fastgltf::math::fvec3& pos, std::size_t idx) { vertices[idx].position = pos; });
-
                 fastgltf::iterateAccessorWithIndex<fastgltf::math::fvec3>(
                     asset.get(), normal_accessor,
                     [&](const fastgltf::math::fvec3& norm, std::size_t idx) { vertices[idx].normal = norm; });
+                fastgltf::iterateAccessorWithIndex<fastgltf::math::fvec4>(
+                    asset.get(), tangent_accessor,
+                    [&](const fastgltf::math::fvec4& tang, std::size_t idx) { vertices[idx].tangent = tang; });
                 fastgltf::iterateAccessorWithIndex<fastgltf::math::fvec2>(
                     asset.get(), uv_accessor,
                     [&](const fastgltf::math::fvec2& uv, std::size_t idx) { vertices[idx].uv = uv; });
@@ -124,14 +129,17 @@ Mesh::create_buffers() -> bool
     gl::glEnableVertexArrayAttrib(this->vertex_array, 0);
     gl::glEnableVertexArrayAttrib(this->vertex_array, 1);
     gl::glEnableVertexArrayAttrib(this->vertex_array, 2);
+    gl::glEnableVertexArrayAttrib(this->vertex_array, 3);
 
     gl::glVertexArrayAttribFormat(this->vertex_array, 0, 3, gl::GL_FLOAT, gl::GL_FALSE, offsetof(Vertex, position));
     gl::glVertexArrayAttribFormat(this->vertex_array, 1, 3, gl::GL_FLOAT, gl::GL_FALSE, offsetof(Vertex, normal));
-    gl::glVertexArrayAttribFormat(this->vertex_array, 2, 2, gl::GL_FLOAT, gl::GL_FALSE, offsetof(Vertex, uv));
+    gl::glVertexArrayAttribFormat(this->vertex_array, 2, 4, gl::GL_FLOAT, gl::GL_FALSE, offsetof(Vertex, tangent));
+    gl::glVertexArrayAttribFormat(this->vertex_array, 3, 2, gl::GL_FLOAT, gl::GL_FALSE, offsetof(Vertex, uv));
 
     gl::glVertexArrayAttribBinding(this->vertex_array, 0, 0);
     gl::glVertexArrayAttribBinding(this->vertex_array, 1, 0);
     gl::glVertexArrayAttribBinding(this->vertex_array, 2, 0);
+    gl::glVertexArrayAttribBinding(this->vertex_array, 3, 0);
 
 #ifdef _DEBUG
     assert(fastgltf::validate(asset.get()) == fastgltf::Error::None);
@@ -150,9 +158,12 @@ Mesh::destroy() -> void
 auto
 Mesh::draw() const -> void
 {
-    // TODO(StaticSaga): do not hardcode this
-    int unit = 0;
     gl::glBindVertexArray(this->vertex_array);
+    int albedo_unit = 0, normal_unit = 1;
+    gl::glBindTextureUnit(albedo_unit, this->textures[0]);
+    gl::glUniform1i(4, albedo_unit);
+    gl::glBindTextureUnit(normal_unit, this->textures[2]);
+    gl::glUniform1i(5, normal_unit);
 
     gl::glDrawElements(gl::GL_TRIANGLES, this->indices_count, gl::GL_UNSIGNED_INT, this->indices.data());
 }
