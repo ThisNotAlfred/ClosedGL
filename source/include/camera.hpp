@@ -3,6 +3,7 @@
 class Camera
 {
         public:
+    explicit Camera() = default;
     Camera(short movement_speed, short scrolling_speed, float spinning_speed)
         : movement_speed(movement_speed), scrolling_speed(scrolling_speed), spinning_speed(spinning_speed) {};
     ~Camera() = default;
@@ -21,22 +22,17 @@ class Camera
     // mouse
     auto rotate(float mouse_x, float mouse_y) -> void;
 
-    [[nodiscard]] auto get_projection_matrix() const -> glm::mat4;
+    [[nodiscard]] static auto get_projection_matrix(int width, int height) -> glm::mat4;
     [[nodiscard]] auto get_view_matrix() const -> glm::mat4;
-    [[nodiscard]] auto get_model_matrix() const -> glm::mat4;
 
         private:
     float movement_speed;
     float scrolling_speed;
     float spinning_speed;
 
-    glm::vec4 position = glm::vec4(0, 0, 0, 0);
-    glm::vec3 up       = glm::vec3(0, 1, 0);
-    glm::vec3 target   = glm::vec3();
-
-    glm::mat4 projection = glm::mat4(1);
-    glm::mat4 view       = glm::mat4(1);
-    glm::mat4 model      = glm::mat4(1);
+    glm::vec3 position = glm::vec4(0, 0, 0, 0);
+    glm::vec3 up       = glm::vec4(0, 1, 0, 0);
+    glm::vec3 target   = glm::vec4();
 
     float pitch;
     float yaw;
