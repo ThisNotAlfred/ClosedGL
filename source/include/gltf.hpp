@@ -8,35 +8,37 @@
 
 #include <filesystem>
 
-struct Vertex {
+struct Gltf {
     fastgltf::math::fvec3 position;
     fastgltf::math::fvec3 normal;
     fastgltf::math::fvec4 tangent;
     fastgltf::math::fvec2 uv;
 };
 
-class Mesh
+struct PointLight {
+    fastgltf::math::fvec3 position;
+    fastgltf::math::fvec3 color;
+    fastgltf::math::fvec3 intensity;
+};
+
+class Gltf
 {
         public:
-    Mesh(std::filesystem::path& path) : path(path) {};
-    ~Mesh() = default;
+    Gltf(std::filesystem::path& path) : path(path) {};
+    ~Gltf() = default;
 
-    [[nodiscard]] auto create_buffers() -> bool;
+    [[nodiscard]] auto load_nodes() -> bool;
 
-    // TODO implementing other draw types .e.g instancing
-    auto draw() const -> void;
+    
+    
     auto destroy() -> void;
 
         private:
     std::filesystem::path path;
 
-    int indices_count;
-
-    std::vector<std::uint32_t> indices;
-    std::vector<gl::GLuint> textures;
-
-    gl::GLuint vertex_array;
-    gl::GLuint vertex_buffer;
+    std::vector<fastgltf::Camera> cameras;
+    std::vector<fastgltf::Light> lights;
+    std::vector<fastgltf::Mesh> meshes;
 };
 
 auto compile_shader(std::filesystem::path& path, gl::GLenum shader_type) -> gl::GLuint;

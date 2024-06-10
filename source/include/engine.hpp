@@ -3,7 +3,7 @@
 #include "closed_gl.hpp"
 
 #include "camera.hpp"
-#include "mesh.hpp"
+#include "gltf.hpp"
 #include "tools.hpp"
 #include "user_interface.hpp"
 
@@ -16,6 +16,10 @@ class Engine
     auto init() -> void;
     auto frame() -> void;
 
+    // drawing meshes and other components
+    auto draw_meshes() const -> void;
+    auto emit_lights() const -> void;
+
     auto check_for_input() -> void;
 
         private:
@@ -23,10 +27,11 @@ class Engine
     int width;
     int height;
 
+    // environment variables
     UI user_interface;
     Camera camera;
-    // TODO use a better structur rather than a simple vector for handling mehses and shaders
-    std::vector<Mesh> meshes;
+
+    // TODO: use a better structur rather than a simple vector for handling nodes and shaders
     std::vector<gl::GLuint> shaders;
     gl::GLuint shadow_shader;
 
